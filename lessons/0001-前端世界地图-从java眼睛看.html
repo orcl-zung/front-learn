@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 1 课 · 前端世界地图：用 Java 的眼睛看一遍</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/theme.js"></script>
+<style>
+  /* 本课专用：分层地图 */
+  .stack { margin: 1.6rem 0; }
+  .layer {
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    margin: 0.4rem 0;
+    background: var(--bg-soft);
+  }
+  .layer .l-name { font-family: var(--mono); font-weight: 700; color: var(--heading); }
+  .layer .l-java { color: var(--fg-muted); font-size: 0.9rem; }
+  .layer.framework { border-left-color: var(--warn); background: var(--warn-soft); }
+  .layer.framework .l-name { color: var(--warn); }
+  .vs { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.4rem 0; }
+  .vs > div { border:1px solid var(--rule); border-radius:6px; padding:0.8rem 1rem; }
+  .vs h4 { margin: 0 0 0.4rem; font-size:0.95rem; }
+  .vs .you { background: var(--correct-soft); border-color: var(--correct); }
+  .vs .gap { background: var(--wrong-soft); border-color: var(--wrong); }
+  @media (max-width: 520px){ .vs { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="course-header">
+  <p class="eyebrow">第 1 课 · 阶段一：定位与地图</p>
+  <h1>前端世界地图：用 Java 的眼睛看一遍</h1>
+  <p class="lead">把整个前端世界，挂到你已熟知的 Java/JVM/Spring 地图上。本课不写一行业务代码 ——
+  它要做的事更重要：拆掉「前端很神秘」的心理墙。</p>
+</header>
+
+<h2>本课目标</h2>
+<p>学完你能做到：<strong>看到任何一个前端术语（组件、props、响应式、虚拟 DOM、事件循环……），
+不再发懵，而是立刻在脑子里挂到一个 Java 对应概念上</strong>，并知道它属于哪一层。这是后续一切的地基。</p>
+
+<div class="callout">
+  <p class="callout-title">为什么从这开始</p>
+  <p>你过去能把后台界面「粘出来」，却不敢动底层，是因为缺这张地图。
+  框架（React/Vue）只是冰山一角；它下面压着 CSS、现代 JS、TypeScript、浏览器运行时和工具链。
+  不知道分层，就只能在最上层抄 —— 一旦需求偏离模板就卡死。我们自下而上打通它。</p>
+</div>
+
+<h2>一、分层地图：浏览器 ≈ 前端的 JVM</h2>
+<p>一个网页跑起来，依赖下面这几层。从下往上看，每层都给上层提供能力，越往上越接近你写的业务代码：</p>
+
+<div class="stack">
+  <div class="layer framework">
+    <span class="l-name">React / Vue 框架层</span>
+    <span class="l-java"> — ≈ 一个声明式的 UI 框架（像 JavaFX/Swing，但描述式）</span>
+    <div>把「数据 → 视图」的同步自动化：你只声明 UI 是数据的函数，框架替你接好监听器。</div>
+  </div>
+  <div class="layer">
+    <span class="l-name">TypeScript / 现代 JS（语言层）</span>
+    <span class="l-java"> — ≈ Java 语言 + 静态类型</span>
+    <div>TS 是你的主场。现代 JS（ES2020+）提供 <code>let/const</code>、箭头函数、解构、模块、Promise/async。</div>
+  </div>
+  <div class="layer">
+    <span class="l-name">CSS（样式层）</span>
+    <span class="l-java"> — ≈ JavaFX 的 CSS / 声明式样式表</span>
+    <div>你的最大缺口。决定「长什么样」：颜色、布局、间距、响应式。</div>
+  </div>
+  <div class="layer">
+    <span class="l-name">HTML → DOM（结构层）</span>
+    <span class="l-java"> — ≈ JavaFX 的 Scene Graph / Swing 组件树</span>
+    <div>HTML 是源码；浏览器把它解析成一棵可被 JS 操作的对象树，叫 DOM。</div>
+  </div>
+  <div class="layer">
+    <span class="l-name">浏览器运行时（底层）</span>
+    <span class="l-java"> — ≈ JVM + 标准库 + 图形运行时</span>
+    <div>提供 JS 引擎、DOM、网络、存储、渲染，以及一个单线程的<strong>事件循环</strong>。</div>
+  </div>
+  <div class="layer">
+    <span class="l-name">工具链：npm / Vite（工程层）</span>
+    <span class="l-java"> — ≈ Maven/Gradle + javac</span>
+    <div>管依赖、转译 TS/JSX、热更新、打包。你写的源码要先被它处理，浏览器才能跑。</div>
+  </div>
+</div>
+
+<h2>二、两个「杀手级」类比（务必记住）</h2>
+
+<div class="analogy">
+  <div class="a-label">类比 1 · 事件循环 ≈ Swing 的 EDT</div>
+  <p>浏览器的 JS 是<strong>单线程</strong>的：所有代码、事件回调、UI 重绘，都排在一个队列里轮流执行。
+  这跟 <strong>Swing 的事件派发线程（EDT）</strong>一模一样 —— 你不会在 EDT 上做耗时操作，否则界面卡死；
+  前端同理，耗时任务要用异步（Promise / async）。理解了这一点，JS 的异步就不再反直觉。</p>
+</div>
+
+<div class="analogy">
+  <div class="a-label">类比 2 · 响应式 ≈ PropertyChangeSupport / ChangeListener</div>
+  <p>在 Java 桌面端，你要手动给字段加监听器：<code>字段变了 → 通知 UI → 重绘</code>。
+  React/Vue 把这件事自动化了 —— 你只声明「这块 UI 是这个数据的函数」，数据一变，框架自动刷新视图。
+  <strong>响应式，就是「数据驱动视图」的自动化监听机制。</strong>这是整个框架层的灵魂。</p>
+</div>
+
+<h2>三、你的家底盘点</h2>
+<div class="vs">
+  <div class="you">
+    <h4>✅ 你已经会的（优势）</h4>
+    <ul>
+      <li>强静态类型思维 → TS 几乎白送</li>
+      <li>工程化心智（Maven/构建/依赖）→ npm/Vite 迅速迁移</li>
+      <li>组件/分层/接口设计 → 组件化 UI 思想同源</li>
+      <li>事件/监听/异步 → 响应式与事件循环有 Java 根基</li>
+    </ul>
+  </div>
+  <div class="gap">
+    <h4>⬜ 要补的（缺口）</h4>
+    <ul>
+      <li>CSS（几乎零）→ 系统补：盒模型/Flex/Grid/响应式</li>
+      <li>现代 JS 语法与 DOM API → 能读不能写</li>
+      <li>浏览器运行时模型 → 事件循环、异步</li>
+      <li>从「粘」到「懂」→ 每段代码都要能解释为什么</li>
+    </ul>
+  </div>
+</div>
+
+<h2>四、学习路线图</h2>
+<ol class="roadmap">
+  <li class="done">前端世界地图（本课，建立坐标系）</li>
+  <li class="current">CSS 基础：盒模型 → Flexbox → Grid → 响应式（系统补缺口）</li>
+  <li>现代 JavaScript：语法、DOM、异步（事件循环 / Promise / async）</li>
+  <li>TypeScript：你的主场，快速拿下（重点：结构类型 vs 名义类型）</li>
+  <li>React 深入：组件、props、state、Hook、副作用、表单、路由</li>
+  <li>Vue3 对照：组合式 API，复现同一功能，讲清差异</li>
+  <li>落地：用你的项目，从零独立交付一个前端</li>
+</ol>
+
+<h2>五、自检：这些 Java 类比你挂对了吗？</h2>
+<p class="quiz-q"><span class="qnum">第 1 题 · 工具链</span><br>前端的 <code>npm</code> + <code>package.json</code>，最像 Java 世界的？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a">Maven 与 pom.xml</li>
+  <li data-k="b">JUnit 与测试类</li>
+  <li data-k="c">Git 与版本库</li>
+  <li data-k="d">Lombok 与注解</li>
+</ul>
+<p class="explain">npm 管依赖、package.json 声明依赖与脚本，正是 Maven + pom.xml 的角色。</p>
+
+<p class="quiz-q"><span class="qnum">第 2 题 · 运行时</span><br>浏览器执行 JS 的「事件循环」，最像？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a">Swing 的事件派发线程</li>
+  <li data-k="b">垃圾回收线程</li>
+  <li data-k="c">Spring 的调度器</li>
+  <li data-k="d">Tomcat 的线程池</li>
+</ul>
+<p class="explain">单线程轮询任务队列、派发回调与重绘 —— 与 Swing EDT 同构。这也是 JS 异步的设计根源。</p>
+
+<p class="quiz-q"><span class="qnum">第 3 题 · 组件</span><br>一个组件接收的 <code>props</code>，最像 Java 里的？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a">构造方法的入参</li>
+  <li data-k="b">类的静态常量</li>
+  <li data-k="c">私有的实例字段</li>
+  <li data-k="d">抽象的方法</li>
+</ul>
+<p class="explain">props 是父传子的单向、只读数据，相当于构造入参。私有的可变字段对应的是 state，不是 props。</p>
+
+<p class="quiz-q"><span class="qnum">第 4 题 · 框架灵魂</span><br>框架的「响应式 reactivity」，最像 Java 里的？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a">属性变更监听器</li>
+  <li data-k="b">synchronized 同步锁</li>
+  <li data-k="c">序列化 Serializable</li>
+  <li data-k="d">反射 Reflection</li>
+</ul>
+<p class="explain">响应式 = 数据变了自动通知视图刷新，即 PropertyChangeSupport / ChangeListener 的自动化版本。</p>
+
+<p class="score" id="score"></p>
+
+<hr>
+
+<h2>推荐主源（本课）</h2>
+<p>读一篇就够，建立整体感：<a href="https://developer.mozilla.org/zh-CN/docs/Learn/Getting_started_with_the_web" target="_blank" rel="noopener">MDN · Web 入门</a> ——
+用一页 HTML、一页 CSS、一页 JS 讲清一个网页是怎么搭起来的。遇到任何术语，
+随时回查 <a href="../reference/concept-map-java-frontend.html">Java ↔ 前端 概念对照表</a> 和
+<a href="../reference/glossary.html">术语表</a>。</p>
+
+<div class="callout">
+  <p class="callout-title">随时问我</p>
+  <p>这节课里任何让你「似懂非懂」的地方，直接问。比如：「事件循环既然单线程，那异步请求是怎么做到不卡 UI 的？」
+  —— 我会顺着 Java 的 EDT 给你讲透。我就是你的私教，没有蠢问题。</p>
+</div>
+
+<footer class="lesson-foot">
+  <div class="nav-rows">
+    <span>第 1 课 / 共 7 阶段</span>
+    <span>
+      <a href="../reference/concept-map-java-frontend.html">概念对照表</a> ·
+      <a href="../reference/glossary.html">术语表</a> ·
+      下一课：CSS 盒模型 →
+    </span>
+  </div>
+</footer>
+</div>
+
+<script>
+  // 自检逻辑：点选项 → 判对错 → 显示解析 → 计分。纯原生，也是后面学 JS 的预演。
+  var total = document.querySelectorAll('.options').length;
+  var answered = 0, right = 0;
+  document.querySelectorAll('.options').forEach(function (ul) {
+    var correctKey = ul.dataset.correct;
+    var explain = ul.nextElementSibling.classList.contains('explain') ? ul.nextElementSibling : null;
+    ul.querySelectorAll('li').forEach(function (li) {
+      li.addEventListener('click', function () {
+        if (ul.dataset.locked) return;     // 每题只答一次
+        ul.dataset.locked = '1';
+        var ok = li.dataset.k === correctKey;
+        li.classList.add(ok ? 'correct' : 'wrong');
+        if (!ok) {                          // 顺便标出正确答案
+          ul.querySelector('li[data-k="' + correctKey + '"]').classList.add('correct');
+        }
+        if (explain) explain.classList.add('show');
+        answered++; if (ok) right++;
+        var box = document.getElementById('score');
+        if (answered === total) {
+          box.innerHTML = '得分：<strong>' + right + ' / ' + total + '</strong>' +
+            (right === total ? ' —— 满分！地图已经在你脑子里了，可以进入 CSS。'
+             : ' —— 错的题点开解析看看，随时问我。');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

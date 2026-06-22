@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>前端术语表 · Glossary</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/theme.js"></script>
+<style>
+  dl.gloss { margin: 0; }
+  dl.gloss dt {
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--heading);
+    margin-top: 1.1rem;
+    font-size: 0.95rem;
+  }
+  dl.gloss dd { margin: 0.15rem 0 0 0; color: var(--fg); }
+  dl.gloss dd .alias { color: var(--fg-faint); font-size: 0.85rem; }
+  .group-h { font-family: var(--sans); font-size: 0.78rem; letter-spacing: 0.08em;
+             text-transform: uppercase; color: var(--fg-muted); margin: 2rem 0 0.4rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="course-header">
+  <p class="eyebrow">参考文档 · Reference</p>
+  <h1>前端术语表</h1>
+  <p class="subtitle">课程统一用语。出现新术语时会增补到这里。
+  Java 类比见 <a href="concept-map-java-frontend.html">概念对照表</a>。</p>
+</header>
+
+<p class="group-h">浏览器与文档</p>
+<dl class="gloss">
+  <dt>DOM</dt><dd>文档对象模型。浏览器把 HTML 解析成一棵可被 JS 操作的对象树。
+    <span class="alias">≈ JavaFX Scene Graph</span></dd>
+  <dt>元素 element / 节点 node / 标签 tag</dt>
+  <dd>标签是源码里的 <code>&lt;div&gt;</code>；元素是解析后的对象；节点是树里任意一点（元素、文本、注释都是节点）。</dd>
+  <dt>属性 attribute / 属性 property</dt>
+  <dd>attribute 写在 HTML 标签上（<code>class</code>、<code>href</code>）；property 是 DOM 对象的字段。多数情况对应，但有差异。</dd>
+  <dt>事件循环 event loop</dt><dd>浏览器单线程轮询任务队列、执行回调、重绘的机制。
+    <span class="alias">≈ Swing EDT</span></dd>
+  <dt>SPA</dt><dd>单页应用。只有一个 HTML 页面，靠 JS 切换视图、路由不刷新页面。</dd>
+</dl>
+
+<p class="group-h">CSS 样式</p>
+<dl class="gloss">
+  <dt>盒模型 box model</dt><dd>每个元素 = content + padding + border + margin 四层矩形。</dd>
+  <dt>选择器 selector</dt><dd>决定样式规则作用于哪些元素（如 <code>.btn</code>、<code>#id</code>、<code>div &gt; p</code>）。</dd>
+  <dt>Flexbox</dt><dd>一维（行或列）布局模型。后台界面排布的主力。</dd>
+  <dt>Grid</dt><dd>二维（行+列）网格布局模型。</dd>
+  <dt>响应式 responsive / 断点 breakpoint</dt><dd>界面随视口尺寸自适应；断点是切换布局的宽度阈值。</dd>
+  <dt>层叠 cascade / 优先级 specificity</dt><dd>多条规则命中同一元素时，决定谁赢的规则。</dd>
+</dl>
+
+<p class="group-h">工程与语言</p>
+<dl class="gloss">
+  <dt>包管理器 package manager</dt><dd>npm / pnpm / yarn，管理依赖与脚本。
+    <span class="alias">≈ Maven/Gradle</span></dd>
+  <dt>打包器 bundler / 构建 build</dt><dd>Vite/Webpack 等，把源码转译、合并、压缩成浏览器可运行的产物。</dd>
+  <dt>模块 module</dt><dd>一个文件即一个模块，用 <code>import/export</code> 互通。
+    <span class="alias">≈ Java package/import</span></dd>
+  <dt>Promise</dt><dd>异步结果的占位对象。
+    <span class="alias">≈ CompletableFuture</span></dd>
+  <dt>async / await</dt><dd>以同步写法表达异步流程的语法糖。</dd>
+</dl>
+
+<p class="group-h">TypeScript</p>
+<dl class="gloss">
+  <dt>类型注解 type annotation</dt><dd><code>let x: number</code>，给变量/参数/返回值标类型。</dd>
+  <dt>接口 interface / 类型别名 type</dt><dd>描述对象形状。<span class="alias">≈ Java interface（但结构类型）</span></dd>
+  <dt>联合类型 union</dt><dd><code>A | B</code>，值可以是 A 或 B。</dd>
+  <dt>泛型 generics</dt><dd><code>&lt;T&gt;</code>，参数化类型。与 Java 概念一致。</dd>
+  <dt>类型擦除</dt><dd>TS 编译为 JS 后类型被移除，运行时无类型信息（与 Java 泛型擦除同源但更彻底）。</dd>
+</dl>
+
+<p class="group-h">框架（React / Vue）</p>
+<dl class="gloss">
+  <dt>组件 component</dt><dd>UI 的可复用积木，接收 props、持有 state、产出视图。</dd>
+  <dt>props</dt><dd>父组件传给子组件的只读数据。不要在子组件里改它。</dd>
+  <dt>state 状态</dt><dd>组件自有的、可变的数据；变化会触发重渲染。</dd>
+  <dt>响应式 reactivity</dt><dd>数据变 → 视图自动更新。
+    <span class="alias">≈ PropertyChangeSupport</span></dd>
+  <dt>渲染 render</dt><dd>根据当前数据产出 UI 描述（React 是返回 JSX 的函数；Vue 是模板）。</dd>
+  <dt>虚拟 DOM virtual DOM</dt><dd>内存中的 UI 描述，框架 diff 后最小化更新真实 DOM。</dd>
+  <dt>生命周期钩子 lifecycle hook</dt><dd>组件创建/更新/销毁时执行的逻辑。
+    <span class="alias">≈ @PostConstruct / @PreDestroy</span></dd>
+  <dt>Hook（React）</dt><dd><code>use</code> 开头的函数，在函数组件里复用状态等逻辑。<strong>注意与「生命周期钩子」区分。</strong></dd>
+  <dt>组合式 API Composition API（Vue）</dt><dd>Vue 3 用函数组织逻辑的写法，理念近 React Hook。</dd>
+  <dt>JSX</dt><dd>React 里在 JS 中写类 HTML 标签的语法扩展（<code>&lt;div/&gt;</code>），最终编译成函数调用。</dd>
+  <dt>路由 router</dt><dd>SPA 里把 URL 映射到组件的机制。</dd>
+  <dt>状态管理 store</dt><dd>跨组件共享的可预测状态仓库（Pinia / Redux）。
+    <span class="alias">≈ 全局 Service 单例</span></dd>
+</dl>
+
+<footer class="lesson-foot">
+  参考文档 · 随课程扩充 &nbsp;|&nbsp;
+  <a href="concept-map-java-frontend.html">← 概念对照表</a> &nbsp;
+  <a href="../lessons/0001-前端世界地图-从java眼睛看.html">第 1 课 →</a>
+</footer>
+</div>
+</body>
+</html>

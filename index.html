@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>前端学习课程 · 从 Java 高级开发到全栈</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/theme.js"></script>
+<style>
+  /* 仅首页用：卡片网格、徽章。其余排版沿用共享样式表。 */
+  .hero { border-bottom: 1px solid var(--rule); padding-bottom: 2rem; margin-bottom: 2rem; }
+  .hero h1 { font-size: 2.3rem; }
+  .hero .lead { font-size: 1.15rem; }
+  .tags { margin-top: 0.8rem; }
+  .tags span {
+    display: inline-block; font-family: var(--sans); font-size: 0.78rem;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid #c7d8ff; border-radius: 999px; padding: 0.15rem 0.7rem; margin: 0.2rem 0.2rem 0 0;
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.1rem;
+    background: var(--bg); transition: transform .12s, box-shadow .12s, border-color .12s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 4px 14px rgba(59,91,219,.10); border-bottom: none; }
+  .card .num { font-family: var(--mono); font-size: 0.78rem; color: var(--fg-faint); }
+  .card .title { font-weight: 700; margin: 0.2rem 0 0.3rem; font-size: 1.02rem; color: var(--heading); }
+  .card .desc { font-size: 0.88rem; color: var(--fg-muted); margin: 0; }
+  .badge {
+    display: inline-block; font-family: var(--sans); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: .04em; padding: 0.1rem 0.5rem; border-radius: 4px; margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+  .badge.done { background: var(--correct-soft); color: var(--correct); }
+  .badge.next { background: var(--accent-soft); color: var(--accent); }
+  .badge.todo { background: var(--bg-soft); color: var(--fg-faint); }
+
+  .stage { margin: 2.2rem 0 0.8rem; display: flex; align-items: baseline; gap: 0.6rem; }
+  .stage h2 { margin: 0; font-size: 1.2rem; }
+  .stage .stage-meta { font-family: var(--sans); font-size: 0.8rem; color: var(--fg-faint); }
+  .card.locked { opacity: 0.65; cursor: default; }
+  .card.locked:hover { transform: none; border-color: var(--rule); box-shadow: none; }
+
+  .ref-grid .card .title { color: var(--warn); }
+  .doclinks { font-family: var(--sans); font-size: 0.9rem; color: var(--fg-muted); }
+  .doclinks a { margin-right: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap" style="max-width:880px;">
+
+<header class="hero">
+  <p class="eyebrow">前端学习课程 · Frontend for Java Developers</p>
+  <h1>从 Java 高级开发到全栈</h1>
+  <p class="lead">用 Java/JVM/Spring 的眼睛，系统打通 CSS → 现代 JS → TypeScript → React → Vue。
+  落地项目：<strong>个人博客系统</strong>（SEO / 动效 / better-auth / RBAC / 全文搜索）。</p>
+  <div class="tags">
+    <span>先 React 再 Vue</span><span>系统补 CSS</span>
+    <span>全程 Java 类比</span><span>反粘贴复制</span>
+  </div>
+</header>
+
+<div class="callout">
+  <p class="callout-title">怎么用这个工作区</p>
+  <p>按顺序上课 → 每课做完末尾自检 → 卡住就问（我是你的私教）。
+  <a href="reference/concept-map-java-frontend.html">概念对照表</a> 和
+  <a href="reference/glossary.html">术语表</a> 是常回查的资料；
+  <a href="reference/project-blog-map.html">项目地图</a> 把每个功能钉到对应课程。
+  所有链接都是相对路径，push 到 GitHub 后任何系统都能跳转。</p>
+</div>
+
+<!-- ============ 阶段 1 ============ -->
+<div class="stage">
+  <h2>① 定位与地图</h2>
+  <span class="stage-meta">建立坐标系 · 把陌生术语钉到 Java 概念上</span>
+</div>
+<div class="grid">
+  <a class="card" href="lessons/0001-前端世界地图-从java眼睛看.html">
+    <div><span class="num">0001</span><span class="badge done">已完成</span></div>
+    <div class="title">前端世界地图：用 Java 的眼睛看一遍</div>
+    <p class="desc">浏览器≈JVM、事件循环≈Swing EDT、响应式≈PropertyChangeSupport。拆掉「前端很神秘」的墙。</p>
+  </a>
+</div>
+
+<!-- ============ 阶段 2 ============ -->
+<div class="stage">
+  <h2>② CSS 基础</h2>
+  <span class="stage-meta">补你最大的缺口 · 系统学，不靠抄</span>
+</div>
+<div class="grid">
+  <div class="card locked">
+    <div><span class="num">0002</span><span class="badge next">下一课</span></div>
+    <div class="title">盒模型：每个元素的四层矩形</div>
+    <p class="desc">content / padding / border / margin。类比 Java 组件的 insets。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">0003</span><span class="badge todo">预告</span></div>
+    <div class="title">Flexbox：一维布局主力</div>
+    <p class="desc">类比 BoxLayout。后台界面排布的看家本领。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">0004</span><span class="badge todo">预告</span></div>
+    <div class="title">Grid：二维布局</div>
+    <p class="desc">类比 GridLayout / GridBagLayout。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">0005</span><span class="badge todo">预告</span></div>
+    <div class="title">定位 · 响应式 · 动效</div>
+    <p class="desc">position、媒体查询断点、transition/transform —— 博客动效的地基。</p>
+  </div>
+</div>
+
+<!-- ============ 阶段 3 ============ -->
+<div class="stage">
+  <h2>③ 现代 JavaScript</h2>
+  <span class="stage-meta">从「能读」到「能写」</span>
+</div>
+<div class="grid">
+  <div class="card locked">
+    <div><span class="num">0006</span><span class="badge todo">预告</span></div>
+    <div class="title">语法与 DOM</div>
+    <p class="desc">let/const、箭头函数、解构、模块、DOM 操作。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">0007</span><span class="badge todo">预告</span></div>
+    <div class="title">异步与事件循环</div>
+    <p class="desc">Promise / async-await ≈ CompletableFuture。搜索框防抖实战。</p>
+  </div>
+</div>
+
+<!-- ============ 阶段 4 ============ -->
+<div class="stage">
+  <h2>④ TypeScript</h2>
+  <span class="stage-meta">你的主场 · 快赢点</span>
+</div>
+<div class="grid">
+  <div class="card locked">
+    <div><span class="num">0008</span><span class="badge todo">预告</span></div>
+    <div class="title">类型系统</div>
+    <p class="desc">接口、泛型、联合类型。重点：结构类型 vs Java 名义类型。</p>
+  </div>
+</div>
+
+<!-- ============ 阶段 5 ============ -->
+<div class="stage">
+  <h2>⑤ React 深入</h2>
+  <span class="stage-meta">优先吃透 · 落地博客前端</span>
+</div>
+<div class="grid">
+  <div class="card locked">
+    <div><span class="num">0009</span><span class="badge todo">预告</span></div>
+    <div class="title">组件 · props · state</div>
+    <p class="desc">函数组件、单向数据流、响应式刷新。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">0010</span><span class="badge todo">预告</span></div>
+    <div class="title">Hook 与副作用</div>
+    <p class="desc">useState/useEffect。数据获取、表单、条件渲染（RBAC 基础）。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">0011</span><span class="badge todo">预告</span></div>
+    <div class="title">路由 · 表单 · API 对接</div>
+    <p class="desc">better-auth 登录流、全文搜索、加载/错误态。</p>
+  </div>
+</div>
+
+<!-- ============ 阶段 6 / 7 ============ -->
+<div class="stage">
+  <h2>⑥ Vue3 对照　·　⑦ 项目落地</h2>
+  <span class="stage-meta">组合式 API 复现同一功能 → 独立交付博客前端</span>
+</div>
+<div class="grid">
+  <div class="card locked">
+    <div><span class="num">0012+</span><span class="badge todo">预告</span></div>
+    <div class="title">Vue3 组合式 API 对照</div>
+    <p class="desc">复现 React 功能，讲清差异。</p>
+  </div>
+  <div class="card locked">
+    <div><span class="num">最终</span><span class="badge todo">预告</span></div>
+    <div class="title">博客系统前端交付</div>
+    <p class="desc">把全部能力落到你的真实项目。后端栈在此时正式敲定。</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============ 参考文档 ============ -->
+<div class="stage"><h2>📘 参考文档</h2><span class="stage-meta">压缩精华 · 常回查</span></div>
+<div class="grid ref-grid">
+  <a class="card" href="reference/concept-map-java-frontend.html">
+    <div class="title">Java ↔ 前端 概念对照表</div>
+    <p class="desc">每个前端概念挂到一个 Java 对应物上。你的超能力锚点。</p>
+  </a>
+  <a class="card" href="reference/glossary.html">
+    <div class="title">术语表 Glossary</div>
+    <p class="desc">课程统一用语，新术语持续增补。</p>
+  </a>
+  <a class="card" href="reference/project-blog-map.html">
+    <div class="title">项目地图：博客系统</div>
+    <p class="desc">功能 → 知识 → 阶段。回答「为什么先补 CSS/JS/TS」。</p>
+  </a>
+</div>
+
+<!-- ============ 工程文档 ============ -->
+<div class="stage"><h2>🗂 工程文档</h2><span class="stage-meta">Markdown · GitHub 上自动渲染</span></div>
+<p class="doclinks">
+  <a href="MISSION.md">MISSION（学习使命）</a>
+  <a href="RESOURCES.md">RESOURCES（资源）</a>
+  <a href="NOTES.md">NOTES（教学笔记）</a>
+</p>
+
+<footer class="lesson-foot">
+  <div class="nav-rows">
+    <span>前端学习课程 · 工作区首页</span>
+    <span>当前进度：阶段 ① 完成，下一课 <a href="lessons/0001-前端世界地图-从java眼睛看.html">从第 1 课开始 / 复习</a></span>
+  </div>
+</footer>
+</div>
+</body>
+</html>

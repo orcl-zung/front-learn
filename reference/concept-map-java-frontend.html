@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java ↔ 前端 概念对照表 · 参考文档</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/theme.js"></script>
+<style>
+  /* 参考文档专用：让对照表更紧凑可读 */
+  table.map th, table.map td { font-size: 0.9rem; }
+  table.map td:first-child { white-space: nowrap; font-family: var(--mono); color: var(--heading); }
+  .star { color: var(--warn); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="course-header">
+  <p class="eyebrow">参考文档 · Reference</p>
+  <h1>Java ↔ 前端 概念对照表</h1>
+  <p class="subtitle">把每一个陌生前端概念，钉到一个你已熟知的 Java/JVM/Spring 概念上。
+  带 <span class="star">★</span> 的是「关键且极易出错」的类比 —— 那里两者并不完全相同，注意差异。</p>
+</header>
+
+<p>使用方法：遇到新词先来这里查它的 Java 骨架，再去 <a href="glossary.html">术语表</a> 看精确定义，
+最后回到当节课做练习。这份表会随课程推进不断扩充。</p>
+
+<h2>一、工具链 / 工程</h2>
+<table class="map">
+<thead><tr><th>前端概念</th><th>Java 类比</th><th>说明 / 差异</th></tr></thead>
+<tbody>
+<tr><td>npm / pnpm / yarn</td><td>Maven / Gradle</td><td>包管理器。npm 是事实标准。</td></tr>
+<tr><td>package.json</td><td>pom.xml / build.gradle</td><td>声明依赖与脚本命令。</td></tr>
+<tr><td>node_modules/</td><td>~/.m2 本地仓库</td><td>区别：依赖默认装进<strong>项目目录内</strong>，体积大。</td></tr>
+<tr><td>Vite / 打包器(bundler)</td><td>javac + jar（但能力更多）</td><td>转译 TS/JSX、压缩、tree-shaking、开发热更新。</td></tr>
+<tr><td>ES Module <code>import/export</code></td><td>Java <code>import</code> / package</td><td>模块的导入导出机制。</td></tr>
+<tr><td>node</td><td>JVM</td><td>JS 运行时；但浏览器自带 JS 运行时，node 主要服务构建与 SSR。</td></tr>
+</tbody>
+</table>
+
+<h2>二、语言层：TypeScript 是你的主场</h2>
+<table class="map">
+<thead><tr><th>前端概念</th><th>Java 类比</th><th>说明 / 差异</th></tr></thead>
+<tbody>
+<tr><td>TypeScript</td><td>Java 的静态类型</td><td>你最大的优势。TS 是 JS 的超集，类型在编译期擦除。</td></tr>
+<tr><td>interface / type</td><td>Java interface</td><td><span class="star">★</span> TS 是<strong>结构类型</strong>(duck typing)，Java 是<strong>名义类型</strong>。形状对了就算匹配，不需要 implements。</td></tr>
+<tr><td>泛型 <code>&lt;T&gt;</code></td><td>Java 泛型 <code>&lt;T&gt;</code></td><td>概念几乎一致。</td></tr>
+<tr><td>联合类型 <code>A | B</code></td><td>无直接对应（Java 21 前无）</td><td><span class="star">★</span> 一个值可以是 A 或 B。Java 21 的 sealed + pattern 近似。</td></tr>
+<tr><td>可选 <code>?:</code> / <code>null | undefined</code></td><td><code>@Nullable</code> / Optional</td><td>TS 用类型表达「可能没有」。</td></tr>
+<tr><td>装饰器 decorator</td><td>注解 <code>@Annotation</code></td><td>概念相同；TS 装饰器是运行时可调用的函数。</td></tr>
+</tbody>
+</table>
+
+<h2>三、运行时：浏览器 ≈ 前端的 JVM</h2>
+<table class="map">
+<thead><tr><th>前端概念</th><th>Java 类比</th><th>说明 / 差异</th></tr></thead>
+<tbody>
+<tr><td>浏览器</td><td>JVM + 标准库 + 图形运行时</td><td>提供 JS 运行时、DOM、网络、存储、渲染。</td></tr>
+<tr><td>DOM</td><td>JavaFX Scene Graph / Swing 组件树</td><td>一棵浏览器维护的对象树，对应页面结构。</td></tr>
+<tr><td>事件循环 event loop <span class="star">★</span></td><td><strong>Swing 的 EDT</strong>（事件派发线程）</td><td>单线程。所有 UI 更新与回调排在这一个队列里。这是理解 JS 异步的钥匙。</td></tr>
+<tr><td>Promise / async-await</td><td>CompletableFuture</td><td>异步结果的占位；await ≈ 阻塞式写法的非阻塞等价物。</td></tr>
+<tr><td>回调 callback</td><td>Listener / 回调接口</td><td>「事情发生时请调用我」。</td></tr>
+<tr><td>setTimeout / 宏任务</td><td>SwingUtilities.invokeLater / ScheduledExecutor</td><td>把任务排进事件循环。</td></tr>
+</tbody>
+</table>
+
+<h2>四、样式：CSS（你目前的最大缺口）</h2>
+<table class="map">
+<thead><tr><th>前端概念</th><th>Java 类比</th><th>说明 / 差异</th></tr></thead>
+<tbody>
+<tr><td>CSS</td><td>JavaFX CSS / FXML 样式表</td><td>声明式地描述外观，与结构分离。</td></tr>
+<tr><td>盒模型 box model</td><td>组件的 insets / 边距</td><td>每个元素 = margin + border + padding + content 四层矩形。</td></tr>
+<tr><td>Flexbox <span class="star">★</span></td><td>BoxLayout / 水平垂直排列的布局管理器</td><td>一维排列（行或列）的首选。</td></tr>
+<tr><td>Grid</td><td>GridLayout / GridBagLayout</td><td>二维网格布局的首选。</td></tr>
+<tr><td>选择器 selector</td><td>无（声明式，按规则匹配）</td><td>决定「哪些元素被这条规则影响」。</td></tr>
+<tr><td>媒体查询 @media</td><td>无（运行时判断视口尺寸）</td><td>响应式：不同屏幕宽度用不同样式。</td></tr>
+</tbody>
+</table>
+
+<h2>五、框架：React / Vue（它们管理 DOM + 状态）</h2>
+<table class="map">
+<thead><tr><th>前端概念</th><th>Java 类比</th><th>说明 / 差异</th></tr></thead>
+<tbody>
+<tr><td>组件 component</td><td>一个可复用的类 / Bean</td><td>UI 的基本积木。React 里是函数或类；Vue 里是 .vue 单文件。</td></tr>
+<tr><td>props <span class="star">★</span></td><td>构造方法入参 / setter（只读）</td><td>父→子的单向数据。<strong>props 是只读的</strong>，别在子组件里改它。</td></tr>
+<tr><td>state 状态</td><td>可变的实例字段</td><td>组件自己持有、可改的数据。改了会触发重新渲染。</td></tr>
+<tr><td>响应式 reactivity <span class="star">★</span></td><td>PropertyChangeSupport / JavaFX 的 ChangeListener</td><td>核心思想：数据变了，视图自动更新。Vue 自动追踪；React 靠 setState/触发。</td></tr>
+<tr><td>渲染 render</td><td>paintComponent / 重绘视图</td><td>根据当前 state 产出 UI 描述。</td></tr>
+<tr><td>虚拟 DOM virtual DOM</td><td>脏标记 dirty checking + 批量 flush</td><td>先在内存里算 diff，再最小化操作真实 DOM。</td></tr>
+<tr><td>生命周期钩子</td><td>@PostConstruct / @PreDestroy / Servlet init,destroy</td><td>组件创建、更新、销毁时挂载逻辑。</td></tr>
+<tr><td>Hook (React) <span class="star">★</span></td><td>把「类的实例能力」抽成可复用函数</td><td><span class="star">★</span> 名字相同但与「生命周期钩子」是两回事。use 开头的函数，在函数组件里复用状态等逻辑。</td></tr>
+<tr><td>组合式 API (Vue)</td><td>同上理念（函数式组织逻辑）</td><td>Vue 3 对应 React Hook 思路的方案。</td></tr>
+<tr><td>SPA 路由 router</td><td>客户端内部自己切视图（不刷新页面）</td><td>类似一个带 <code>@RequestMapping</code> 的桌面程序在本地切屏。</td></tr>
+<tr><td>状态管理 Pinia / Redux</td><td>应用级单例 Service / 全局上下文</td><td>跨组件共享的、可预测的状态仓库。</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+  <p class="callout-title">一句话心法</p>
+  <p>框架做的事情，本质是：<strong>把「数据 → 视图」的同步自动化</strong>。
+  在 Java 桌面端你要手写 Listener 把字段变化刷到 UI；React/Vue 让你只声明「UI 是数据的函数」，框架替你接 Listener。</p>
+</div>
+
+<footer class="lesson-foot">
+  参考文档 · 随课程扩充 &nbsp;|&nbsp;
+  <a href="../lessons/0001-前端世界地图-从java眼睛看.html">← 第 1 课</a> &nbsp;
+  <a href="glossary.html">术语表 →</a>
+</footer>
+</div>
+</body>
+</html>
