@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 2 课 · 盒模型：每个元素的四层矩形</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/theme.js"></script>
+<style>
+  /* 本课专用：盒模型可视化 + box-sizing 切换 demo */
+  .boxdemo {
+    margin: 1.8rem 0; user-select: none;
+  }
+  .bd-tag {
+    display: block; font-family: var(--sans); font-size: 0.7rem;
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;
+  }
+  .bd-margin {
+    background: var(--bg-soft); border: 1px dashed var(--rule);
+    padding: 18px; border-radius: 8px;
+  }
+  .bd-margin .bd-tag { color: var(--fg-faint); }
+  .bd-border {
+    background: var(--warn-soft); padding: 10px; border-radius: 3px;
+    transition: filter .15s;
+  }
+  .bd-border .bd-tag { color: var(--warn); }
+  .bd-padding {
+    background: var(--correct-soft); padding: 18px; border-radius: 3px;
+  }
+  .bd-padding .bd-tag { color: var(--correct); }
+  .bd-content {
+    background: var(--accent-soft); color: var(--heading); text-align: center;
+    padding: 18px; font-family: var(--sans); font-weight: 600; border-radius: 3px;
+  }
+  .bd-margin.hl, .bd-border.hl, .bd-padding.hl, .bd-content.hl {
+    outline: 2px solid var(--accent); outline-offset: -2px; cursor: pointer;
+  }
+  .bd-note {
+    font-family: var(--sans); font-size: 0.86rem; color: var(--fg-muted);
+    margin-top: 0.8rem; text-align: center;
+  }
+
+  /* box-sizing 切换 demo */
+  .sizing-demo { margin: 1.4rem 0; }
+  .sbox {
+    width: 240px; padding: 20px; border: 6px solid var(--accent);
+    background: var(--accent-soft); color: var(--heading);
+    font-family: var(--sans); font-size: 0.9rem; text-align: center;
+  }
+  .sizing-bar {
+    height: 2px; background: repeating-linear-gradient(
+      90deg, var(--fg-faint) 0 6px, transparent 6px 12px);
+    width: 240px; margin: 0.4rem 0 0.2rem; position: relative;
+  }
+  .sizing-bar::after {
+    content: "声明的 width: 240px"; position: absolute; left: 0; top: 6px;
+    font-family: var(--sans); font-size: 0.74rem; color: var(--fg-faint);
+  }
+  .toggle {
+    font-family: var(--sans); font-size: 0.9rem; cursor: pointer;
+    border: 1px solid var(--accent); background: var(--accent-soft);
+    color: var(--accent); padding: 0.5rem 0.9rem; border-radius: 6px;
+    margin-top: 1.6rem; transition: background .12s;
+  }
+  .toggle:hover { background: var(--accent-border); }
+  .sizing-info {
+    font-family: var(--sans); font-size: 0.92rem; margin-top: 0.8rem;
+  }
+  .sizing-info strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="course-header">
+  <p class="eyebrow">第 2 课 · 阶段二：CSS 基础</p>
+  <h1>盒模型：每个元素的四层矩形</h1>
+  <p class="lead">浏览器把<strong>每个</strong>元素都画成一个矩形盒子，盒子由四层套娃组成。
+  这是 CSS 的第 0 公理 —— 后面所有布局（Flex、Grid）都建立在你能否在脑子里"看见"这个盒子。</p>
+</header>
+
+<h2>本课目标</h2>
+<p>学完你能做到：</p>
+<ul>
+  <li>打开浏览器 DevTools，看一眼盒模型彩图，立刻说出每层是什么、多少像素。</li>
+  <li>能解释"为什么这个元素比我设的 <code>width</code> 要宽"。</li>
+  <li>会用一行 <code>box-sizing</code> 杜绝 99% 的尺寸溢出坑。</li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">为什么从盒模型开始</p>
+  <p>你过去粘后台界面时遇到的间距对不齐、内容溢出、按钮宽窄不一，根因几乎都是<strong>没建立盒模型心智</strong>。
+  它是 CSS 的地基。好消息：Java 桌面端那个"组件占多大地方"的模型，就是它的近亲 —— 你比零基础快得多。</p>
+</div>
+
+<h2>一、盒模型：每个元素都是四层套娃</h2>
+<p>浏览器渲染时，把每个元素（哪怕一段 <code>&lt;p&gt;</code> 文字）当成一个<strong>矩形盒子</strong>，
+由外到内四层：<code>margin</code>（外边距）→ <code>border</code>（边框）→ <code>padding</code>（内边距）→
+<code>content</code>（内容）。下面这张图就是这四层 —— 鼠标移到每一层上看看：</p>
+
+<div class="boxdemo">
+  <div class="bd-margin">
+    <span class="bd-tag">margin · 外边距</span>
+    <div class="bd-border">
+      <span class="bd-tag">border · 边框</span>
+      <div class="bd-padding">
+        <span class="bd-tag">padding · 内边距</span>
+        <div class="bd-content">content · 文章标题 + 摘要</div>
+      </div>
+    </div>
+  </div>
+  <p class="bd-note">背景色（<code>background</code>）只铺到 content + padding；margin 是完全透明的，它只是"占位"。</p>
+</div>
+
+<table>
+  <thead><tr><th>层</th><th>CSS 属性</th><th>含义</th><th>Java 对应</th></tr></thead>
+  <tbody>
+    <tr><td><code>margin</code></td><td>外边距</td><td>盒子<strong>外部</strong>的空白，推开别的元素；背景涂不到</td><td>布局管理器的 gap（<code>FlowLayout</code> 的 hgap/vgap）</td></tr>
+    <tr><td><code>border</code></td><td>边框</td><td>盒子的边框线，有粗细 / 样式 / 颜色</td><td><code>LineBorder</code> / <code>BorderFactory.createLineBorder()</code></td></tr>
+    <tr><td><code>padding</code></td><td>内边距</td><td>边框到内容的留白（呼吸空间）</td><td><code>EmptyBorder</code> / <code>Insets</code> 的内填充</td></tr>
+    <tr><td><code>content</code></td><td>内容</td><td>真正放东西的区域（文字 / 子元素）</td><td>组件 <code>preferredSize</code> 的内容区</td></tr>
+  </tbody>
+</table>
+
+<div class="analogy">
+  <div class="a-label">类比 · 盒模型 ≈ 一个 Swing 组件的占地</div>
+  <p>把一个 <code>JButton</code> 摆出来：按钮文字是 <strong>content</strong>；给它套个
+  <code>EmptyBorder</code> 就是 <strong>padding</strong>（内填充）；再套个 <code>LineBorder</code> 就是
+  <strong>border</strong>；把它丢进 <code>FlowLayout</code>，组件之间由 <code>hgap/vgap</code> 拉开的距离就是
+  <strong>margin</strong>。这个组件最终"占多大地方"，就是这四层之和。</p>
+</div>
+
+<h2>二、padding vs margin：到底用哪个</h2>
+<p>这是新手最常卡的选择题。记住一句口诀就够了：</p>
+<blockquote><strong>padding 是"我给自己留白"，margin 是"我推开别人"。</strong></blockquote>
+<ul>
+  <li><strong>padding</strong> = 元素自己的内留白（边框 ↔ 内容之间）。<br>
+  博客场景：文章卡片里，文字到卡片边的呼吸距离 → <code>padding</code>。</li>
+  <li><strong>margin</strong> = 元素和别的元素之间的距离。<br>
+  博客场景：列表里两张文章卡片之间的间隔 → <code>margin</code>。</li>
+</ul>
+<p>还有个判别法：元素有背景色 / 边框时，<strong>背景只覆盖 content + padding</strong>。
+所以你想要"带颜色的留白"用 padding，想要"透明的间隔"用 margin。</p>
+
+<h2>三、最大的坑：box-sizing</h2>
+<p>这是 CSS 最反直觉的默认值，也是你过去踩过无数坑的源头。</p>
+
+<p>默认 <code>box-sizing: content-box</code>：你写的 <code>width</code> <strong>只管 content</strong>。
+一旦你加了 padding / border，盒子实际占地会比 <code>width</code> 大。</p>
+
+<p>而 <code>box-sizing: border-box</code>：<code>width</code> 包含 content + padding + border，
+盒子实际占地就是你写的 <code>width</code>。</p>
+
+<p>点下面按钮，亲眼看同一行代码在两种模式下盒子尺寸怎么变：</p>
+
+<div class="sizing-demo">
+  <div class="sbox" id="sbox">content</div>
+  <div class="sizing-bar"></div>
+  <button class="toggle" id="toggle">点我切换</button>
+  <p class="sizing-info" id="sinfo"></p>
+</div>
+
+<p>看得出来为什么几乎所有项目都在样式最开头写这一行了吗：</p>
+<pre><code>*, *::before, *::after {
+  box-sizing: border-box;
+}</code></pre>
+
+<div class="analogy">
+  <div class="a-label">类比 · border-box ≈ 你设的 width 就是组件占地总宽</div>
+  <p>在 Java 里，<code>setPreferredSize(200, 40)</code> 就是这个组件的<strong>总占地</strong> ——
+  你不会预期给它加个 <code>EmptyBorder</code> 之后还撑出 200 以外。CSS 的 <code>border-box</code> 就是让
+  <code>width</code> 表现得像 Java 的这个直觉；而默认的 <code>content-box</code> 反人类，所以全行业都重置成
+  <code>border-box</code>。<strong>把这行写进每个项目的起点，你就和 Java 的直觉对齐了。</strong></p>
+</div>
+
+<h2>四、margin 折叠：一个历史怪癖</h2>
+<p>两个<strong>垂直相邻</strong>的块元素，它们的上 / 下 margin 不相加，而是<strong>取较大者</strong>（塌陷合并）。</p>
+<p>例：卡片 A <code>margin-bottom: 24px</code>，紧跟着的卡片 B <code>margin-top: 16px</code> →
+两者实际间距是 <strong>24px</strong>，不是 40px。</p>
+<div class="callout warn">
+  <p class="callout-title">Java 没这个对应物</p>
+  <p>这是 CSS 的历史包袱，纯粹记住即可。<strong>好消息</strong>：一旦进入 Flex / Grid 布局（后面几课），
+  margin <strong>不再折叠</strong>。所以这个坑主要影响传统的块级文档流，现代布局里基本遇不到。</p>
+</div>
+
+<h2>五、亲眼看：用 DevTools 验证一切</h2>
+<p>理论说再多不如自己看一次。打开任意网页（包括本课页面）：</p>
+<ol>
+  <li>按 <code>F12</code>（Mac：<code>⌥⌘I</code>）打开开发者工具。</li>
+  <li>在 <strong>Elements</strong> 面板里点选任意一个元素。</li>
+  <li>右侧切到 <strong>Computed</strong>（计算样式），最顶上那张<strong>彩色套娃图</strong>就是它的盒模型。</li>
+  <li>四层各显示实际像素值，还能直接在上面改数字实时预览。</li>
+</ol>
+<p>以后任何"这个元素怎么这么宽 / 这么高"的疑问，打开这张图立刻有答案 —— 它就是本课那张四层图的工程版。</p>
+
+<h2>博客落地：一张文章卡片</h2>
+<p>把今天的概念钉到你的项目上。一张博客文章卡片：</p>
+<ul>
+  <li><strong>content</strong> = 文章标题 + 摘要 + 发布日期等元信息。</li>
+  <li><strong>padding</strong> = 卡片内文字到卡片边的呼吸空间（比如 <code>16px</code>）。</li>
+  <li><strong>border</strong> = 卡片描边（<code>1px</code>），或干脆无边框改用阴影。</li>
+  <li><strong>margin</strong> = 列表里卡片彼此的间距（比如 <code>16px</code>）。</li>
+</ul>
+<p><strong>动手</strong>：打开本课页面，按 <code>F12</code>，选中上面那个彩色盒子的最外层，
+在 Computed 里把它的 <code>padding</code> 改大，亲眼看内层怎么被挤 —— 这就是你以后调样式的日常。</p>
+
+<h2>六、自检：四层你挂对了吗？</h2>
+
+<p class="quiz-q"><span class="qnum">第 1 题 · padding 的 Java 对应</span><br>CSS 的 <code>padding</code>，最像 Java 里的？</p>
+<ul class="options" data-correct="b">
+  <li data-k="a"><code>FlowLayout</code> 的 hgap</li>
+  <li data-k="b"><code>EmptyBorder</code> / <code>Insets</code> 内填充</li>
+  <li data-k="c"><code>LineBorder</code> 的厚度</li>
+  <li data-k="d"><code>setPreferredSize()</code></li>
+</ul>
+<p class="explain">padding 是边框到内容的内留白，正是 <code>EmptyBorder</code> 制造的效果、<code>Insets</code> 描述的量。
+hgap 是组件之间的间距（margin 的角色），LineBorder 是边框（border 的角色）。</p>
+
+<p class="quiz-q"><span class="qnum">第 2 题 · 默认 content-box</span><br>默认盒模型下，<code>width: 300px</code> + <code>padding: 20px</code>（左右各） + <code>border: 5px</code>（左右各），盒子实际占地宽？</p>
+<ul class="options" data-correct="c">
+  <li data-k="a">300px</li>
+  <li data-k="b">330px</li>
+  <li data-k="c">350px</li>
+  <li data-k="d">340px</li>
+</ul>
+<p class="explain">content-box 下 <code>width</code> 只算 content。padding 水平共 40，border 水平共 10，
+合计 300 + 40 + 10 = 350px。这就是"盒子比预期宽"的来源。</p>
+
+<p class="quiz-q"><span class="qnum">第 3 题 · 切到 border-box</span><br>同样设置，但加了 <code>box-sizing: border-box</code>，盒子宽？其中 content 宽？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a">盒子 300px，content 250px</li>
+  <li data-k="b">盒子 350px，content 300px</li>
+  <li data-k="c">盒子 300px，content 300px</li>
+  <li data-k="d">盒子 350px，content 250px</li>
+</ul>
+<p class="explain">border-box 下 <code>width:300px</code> 就是总占地。content 被挤成 300 − 40(padding) − 10(border) = 250px。
+这正是 Java <code>setPreferredSize</code> 的直觉。</p>
+
+<p class="quiz-q"><span class="qnum">第 4 题 · 背景铺到哪</span><br>给一个元素设了 <code>background</code>，颜色会覆盖到哪一层？</p>
+<ul class="options" data-correct="b">
+  <li data-k="a">只有 content</li>
+  <li data-k="b">content + padding（border 内侧以内）</li>
+  <li data-k="c">content + padding + margin</li>
+  <li data-k="d">只有 padding</li>
+</ul>
+<p class="explain">背景铺到 border 内边缘以内，即 content + padding。margin 永远透明。
+所以"带颜色的留白"用 padding，"透明的间隔"用 margin。</p>
+
+<p class="score" id="score"></p>
+
+<hr>
+
+<h2>推荐主源（本课）</h2>
+<p>读完这篇，把今天的图彻底坐实：<a href="https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/The_box_model" target="_blank" rel="noopener">MDN · 盒模型</a>。
+更系统的 CSS 教程跟 <a href="https://web.dev/learn/css?hl=zh#box-model" target="_blank" rel="noopener">web.dev · Learn CSS 的盒模型章节</a>。
+任何时候术语存疑，回查 <a href="../reference/concept-map-java-frontend.html">概念对照表</a> 和
+<a href="../reference/glossary.html">术语表</a>。</p>
+
+<div class="callout">
+  <p class="callout-title">随时问我</p>
+  <p>这节课里任何让你"似懂非懂"的地方，直接问。比如："为什么背景不铺到 margin？"
+  或 "DevTools 里那张图我看的数值和算的对不上，是哪里漏了？" —— 我顺着 Java 给你讲透。</p>
+</div>
+
+<footer class="lesson-foot">
+  <div class="nav-rows">
+    <span><a href="0001-前端世界地图-从java眼睛看.html">← 第 1 课：前端世界地图</a></span>
+    <span>
+      <a href="../reference/concept-map-java-frontend.html">概念对照表</a> ·
+      <a href="../reference/glossary.html">术语表</a> ·
+      下一课：Flexbox 布局 →
+    </span>
+  </div>
+</footer>
+</div>
+
+<script>
+  // box-sizing 切换 demo
+  var sbox = document.getElementById('sbox');
+  var btn = document.getElementById('toggle');
+  var info = document.getElementById('sinfo');
+  var mode = 'content';
+  function renderSizing() {
+    sbox.style.boxSizing = (mode === 'content') ? 'content-box' : 'border-box';
+    btn.textContent = (mode === 'content')
+      ? '当前：content-box（默认）· 点我切到 border-box'
+      : '当前：border-box · 点我切回 content-box';
+    var occupy = (mode === 'content') ? 292 : 240;   // 240 + 40(padding) + 12(border)
+    var contentW = (mode === 'content') ? 240 : 188; // 240 - 40 - 12
+    info.innerHTML = '声明的 <code>width:240px</code> · 盒子实际占地 <strong>' + occupy
+      + 'px</strong> · 其中 content 宽 <strong>' + contentW + 'px</strong>';
+  }
+  renderSizing();
+  btn.addEventListener('click', function () {
+    mode = (mode === 'content') ? 'border' : 'content';
+    renderSizing();
+  });
+
+  // 盒模型可视化：mouseenter 不冒泡，鼠标进入哪一层就只高亮哪一层
+  var boxEl = document.querySelector('.boxdemo');
+  ['bd-margin', 'bd-border', 'bd-padding', 'bd-content'].forEach(function (cls) {
+    boxEl.querySelectorAll('.' + cls).forEach(function (el) {
+      el.addEventListener('mouseenter', function () {
+        boxEl.querySelectorAll('.hl').forEach(function (h) { h.classList.remove('hl'); });
+        el.classList.add('hl');
+      });
+    });
+  });
+  boxEl.addEventListener('mouseleave', function () {
+    boxEl.querySelectorAll('.hl').forEach(function (h) { h.classList.remove('hl'); });
+  });
+
+  // 自检逻辑：点选项 → 判对错 → 显示解析 → 计分（与第 1 课同构）
+  var total = document.querySelectorAll('.options').length;
+  var answered = 0, right = 0;
+  document.querySelectorAll('.options').forEach(function (ul) {
+    var correctKey = ul.dataset.correct;
+    var explain = ul.nextElementSibling.classList.contains('explain') ? ul.nextElementSibling : null;
+    ul.querySelectorAll('li').forEach(function (li) {
+      li.addEventListener('click', function () {
+        if (ul.dataset.locked) return;
+        ul.dataset.locked = '1';
+        var ok = li.dataset.k === correctKey;
+        li.classList.add(ok ? 'correct' : 'wrong');
+        if (!ok) {
+          ul.querySelector('li[data-k="' + correctKey + '"]').classList.add('correct');
+        }
+        if (explain) explain.classList.add('show');
+        answered++; if (ok) right++;
+        var box = document.getElementById('score');
+        if (answered === total) {
+          box.innerHTML = '得分：<strong>' + right + ' / ' + total + '</strong>' +
+            (right === total ? ' —— 满分！盒模型已经长在你脑子里了，可以进入 Flexbox。'
+             : ' —— 错的题点开解析看看，随时问我。');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
