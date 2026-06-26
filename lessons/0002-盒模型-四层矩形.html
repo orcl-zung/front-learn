@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="../assets/style.css">
 <script src="../assets/theme.js"></script>
 <style>
-  /* 本课专用：盒模型可视化 + box-sizing 切换 demo */
+  /* === 四层套娃可视化 + box-sizing 切换 demo === */
   .boxdemo {
     margin: 1.8rem 0; user-select: none;
   }
@@ -68,6 +68,87 @@
     font-family: var(--sans); font-size: 0.92rem; margin-top: 0.8rem;
   }
   .sizing-info strong { color: var(--accent); }
+
+  /* === 移植自整合版：content-box vs border-box 并排对比 === */
+  .vs-demo { margin: 1.8rem 0; }
+  .vs-intro { font-size: .95rem; color: var(--fg-muted); }
+  .vs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; margin-top: .9rem; }
+  .vs-col { min-width: 0; }
+  .vs-tag { font-family: var(--sans); font-size: .8rem; font-weight: 700; margin-bottom: .45rem; }
+  .vs-tag.bad { color: var(--wrong); }
+  .vs-tag.good { color: var(--correct); }
+  /* 200px 基准虚线：与下方盒子同宽同起点，content-box 盒子会超出它 */
+  .ruler { width: 200px; border-top: 2px dashed var(--fg-faint); margin-bottom: .5rem; position: relative; }
+  .ruler span {
+    position: absolute; top: -.65rem; left: 0;
+    font-family: var(--sans); font-size: .68rem; color: var(--fg-faint);
+    background: var(--bg); padding: 0 .25rem;
+  }
+  .vsbox { width: 200px; padding: 24px; font-family: var(--sans); font-size: .85rem; color: var(--fg); }
+  .vsbox.cb { box-sizing: content-box; border: 8px solid var(--wrong); background: var(--wrong-soft); }
+  .vsbox.bb { box-sizing: border-box; border: 8px solid var(--correct); background: var(--correct-soft); }
+  .vs-calc { margin-top: .55rem; font-family: var(--mono); font-size: .8rem; color: var(--fg-muted); }
+  .vs-calc strong { color: var(--heading); }
+  @media (max-width: 520px){ .vs-row { grid-template-columns: 1fr; } }
+
+  /* === 移植自整合版：四层盒模型探索器（拖滑块） === */
+  :root {
+    --bm-margin: rgba(59, 91, 219, .16);
+    --bm-border: #3b5bdb;
+    --bm-padding: rgba(232, 89, 12, .22);
+    --bm-content: var(--bg-soft);
+  }
+  [data-theme="dark"] {
+    --bm-margin: rgba(139, 158, 255, .18);
+    --bm-border: #8b9eff;
+    --bm-padding: rgba(227, 179, 65, .20);
+    --bm-content: var(--bg-soft);
+  }
+  .demo { margin: 1.6rem 0; }
+  .demo-stage {
+    border: 1px dashed var(--rule); border-radius: 8px;
+    padding: 1.4rem 1rem; background: var(--bg-stripe);
+    overflow-x: auto; text-align: center;
+  }
+  /* 四层嵌套：margin(外层 padding 模拟染色) > border > padding(背景) > content */
+  .dm { text-align: left; border-radius: 3px; }
+  .dm.margin, .dm.border { display: inline-block; }
+  .dm.content { display: block; width: 100%; }
+  .dm.margin { background: var(--bm-margin); }
+  .dm.border { border-style: solid; border-color: var(--bm-border); background: var(--bm-padding); }
+  .dm.content { background: var(--bm-content); color: var(--fg); }
+  .card-body { padding: .2rem 0; min-width: 120px; }
+  .card-body h4 { margin: 0 0 .25rem; font-size: .95rem; }
+  .card-body p { margin: 0; font-size: .82rem; color: var(--fg-muted); line-height: 1.45; }
+
+  .demo-controls {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .8rem 1.4rem; margin-top: 1rem;
+    font-family: var(--sans); font-size: .9rem;
+  }
+  .demo-controls label { display: flex; align-items: center; gap: .5rem; }
+  .demo-controls input[type="range"] { flex: 1; accent-color: var(--accent); }
+  .demo-controls .val { font-family: var(--mono); min-width: 2.4em; text-align: right; color: var(--fg-muted); }
+  .bs-btn {
+    grid-column: 1 / -1; justify-self: start;
+    font-family: var(--sans); font-size: .85rem; font-weight: 600;
+    padding: .5rem .9rem; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--rule); background: var(--bg-soft); color: var(--fg-muted);
+    transition: background .12s, border-color .12s, color .12s;
+  }
+  .bs-btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .bs-btn code { background: none; border: none; padding: 0; }
+
+  .demo-readout {
+    margin-top: 1rem; padding: .9rem 1rem; border-radius: 8px;
+    background: var(--bg-soft); border: 1px solid var(--rule);
+    font-family: var(--mono); font-size: .85rem; line-height: 1.7;
+  }
+  .demo-readout .legend { display: flex; flex-wrap: wrap; gap: .6rem 1.1rem; margin-bottom: .5rem; font-family: var(--sans); }
+  .demo-readout .sw { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; margin-right: .3rem; vertical-align: -1px; }
+  .demo-readout .calc { color: var(--fg); }
+  .demo-readout .verdict { margin-top: .4rem; color: var(--fg-muted); font-family: var(--sans); }
+  .demo-readout .num { color: var(--accent); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -160,6 +241,27 @@
   <p class="sizing-info" id="sinfo"></p>
 </div>
 
+<p>还是觉得抽象？把两种模式<strong>并排放</strong>，差距一目了然。同一张文章卡片
+<code>.card</code>（<code>width:200px; padding:24px; border:8px solid</code>），只差一行 <code>box-sizing</code>。
+上方虚线是 <strong>200px 基准</strong> —— 看 content-box 如何超出、border-box 如何齐平：</p>
+
+<div class="vs-demo">
+  <div class="vs-row">
+    <div class="vs-col">
+      <div class="vs-tag bad">content-box（默认）</div>
+      <div class="ruler"><span>200px 基准</span></div>
+      <div class="vsbox cb">文章卡片</div>
+      <div class="vs-calc">200 + 24×2 + 8×2 = <strong>264px</strong>，超出基准 64px</div>
+    </div>
+    <div class="vs-col">
+      <div class="vs-tag good">border-box</div>
+      <div class="ruler"><span>200px 基准</span></div>
+      <div class="vsbox bb">文章卡片</div>
+      <div class="vs-calc">width 就是 <strong>200px</strong>，padding/border 向内吃</div>
+    </div>
+  </div>
+</div>
+
 <p>看得出来为什么几乎所有项目都在样式最开头写这一行了吗：</p>
 <pre><code>*, *::before, *::after {
   box-sizing: border-box;
@@ -170,20 +272,55 @@
   <p>在 Java 里，<code>setPreferredSize(200, 40)</code> 就是这个组件的<strong>总占地</strong> ——
   你不会预期给它加个 <code>EmptyBorder</code> 之后还撑出 200 以外。CSS 的 <code>border-box</code> 就是让
   <code>width</code> 表现得像 Java 的这个直觉；而默认的 <code>content-box</code> 反人类，所以全行业都重置成
-  <code>border-box</code>。<strong>把这行写进每个项目的起点，你就和 Java 的直觉对齐了。</strong></p>
+  <code>border-box</code>。<strong>把这行写进每个项目的起点，你就和 Java 的直觉对齐了。</strong>这份课程样式表
+  <code>assets/style.css</code> 第 65 行就是这么写的，可以打开验证。</p>
 </div>
 
-<h2>四、margin 折叠：一个历史怪癖</h2>
+<h2>四、动手实验室：自由调四层</h2>
+<p>上面是"我给你设好、你点切换"。这一节换成<strong>你完全掌控</strong>：拖动 padding / border / margin
+三个滑块，再切 <code>box-sizing</code>，看四层如何此消彼长、盒子总占地怎么变。content 区依旧是你的博客文章卡片。
+四种颜色分别对应四层（图例在下方读数里）：</p>
+
+<div class="demo">
+  <div class="demo-stage">
+    <div class="dm margin" id="dMargin">
+      <div class="dm border" id="dBorder">
+        <div class="dm content" id="dContent">
+          <div class="card-body">
+            <h4>第 1 篇 · 响应式设计入门</h4>
+            <p>这是文章卡片的内容区 content。拖滑块，看它如何被 padding / border 挤压。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-controls">
+    <label>padding <input type="range" id="rPad" min="0" max="40" value="16"><span class="val" id="vPad">16</span></label>
+    <label>border <input type="range" id="rBor" min="0" max="16" value="4"><span class="val" id="vBor">4</span></label>
+    <label>margin <input type="range" id="rMar" min="0" max="40" value="12"><span class="val" id="vMar">12</span></label>
+    <button class="bs-btn on" id="bsBtn"><code>box-sizing: border-box</code>（点击切换）</button>
+  </div>
+
+  <div class="demo-readout" id="readout"></div>
+</div>
+
+<p>试试这几个"顿悟"操作：① 把 padding 拉满、切到 <code>content-box</code>，看盒子总占地暴涨；
+② 切到 <code>border-box</code>，总占地立刻锁回 <code>width</code>，content 被挤瘦；③ margin 只动外圈、
+不进盒子尺寸。这就是你以后调样式的肌肉记忆来源。</p>
+
+<h2>五、margin 折叠：一个历史怪癖</h2>
 <p>两个<strong>垂直相邻</strong>的块元素，它们的上 / 下 margin 不相加，而是<strong>取较大者</strong>（塌陷合并）。</p>
 <p>例：卡片 A <code>margin-bottom: 24px</code>，紧跟着的卡片 B <code>margin-top: 16px</code> →
 两者实际间距是 <strong>24px</strong>，不是 40px。</p>
 <div class="callout warn">
   <p class="callout-title">Java 没这个对应物</p>
-  <p>这是 CSS 的历史包袱，纯粹记住即可。<strong>好消息</strong>：一旦进入 Flex / Grid 布局（后面几课），
+  <p>这是 CSS 的历史包袱，纯粹记住即可。还有两条：<strong>只有垂直方向折叠</strong>（水平不折叠）；
+  父子元素在没有 border / padding 隔开时也可能折叠。<strong>好消息</strong>：一旦进入 Flex / Grid 布局（后面几课），
   margin <strong>不再折叠</strong>。所以这个坑主要影响传统的块级文档流，现代布局里基本遇不到。</p>
 </div>
 
-<h2>五、亲眼看：用 DevTools 验证一切</h2>
+<h2>六、亲眼看：用 DevTools 验证一切</h2>
 <p>理论说再多不如自己看一次。打开任意网页（包括本课页面）：</p>
 <ol>
   <li>按 <code>F12</code>（Mac：<code>⌥⌘I</code>）打开开发者工具。</li>
@@ -201,10 +338,10 @@
   <li><strong>border</strong> = 卡片描边（<code>1px</code>），或干脆无边框改用阴影。</li>
   <li><strong>margin</strong> = 列表里卡片彼此的间距（比如 <code>16px</code>）。</li>
 </ul>
-<p><strong>动手</strong>：打开本课页面，按 <code>F12</code>，选中上面那个彩色盒子的最外层，
-在 Computed 里把它的 <code>padding</code> 改大，亲眼看内层怎么被挤 —— 这就是你以后调样式的日常。</p>
+<p><strong>动手</strong>：回到上面的"动手实验室"，把 padding 拉大、margin 调整，对照读数里四层的像素值 ——
+这就是你以后调样式的日常。</p>
 
-<h2>六、自检：四层你挂对了吗？</h2>
+<h2>七、自检：四层你挂对了吗？</h2>
 
 <p class="quiz-q"><span class="qnum">第 1 题 · padding 的 Java 对应</span><br>CSS 的 <code>padding</code>，最像 Java 里的？</p>
 <ul class="options" data-correct="b">
@@ -275,7 +412,7 @@ hgap 是组件之间的间距（margin 的角色），LineBorder 是边框（bor
 </div>
 
 <script>
-  // box-sizing 切换 demo
+  // === box-sizing 切换 demo ===
   var sbox = document.getElementById('sbox');
   var btn = document.getElementById('toggle');
   var info = document.getElementById('sinfo');
@@ -296,7 +433,7 @@ hgap 是组件之间的间距（margin 的角色），LineBorder 是边框（bor
     renderSizing();
   });
 
-  // 盒模型可视化：mouseenter 不冒泡，鼠标进入哪一层就只高亮哪一层
+  // === 盒模型可视化：mouseenter 不冒泡，鼠标进入哪一层就只高亮哪一层 ===
   var boxEl = document.querySelector('.boxdemo');
   ['bd-margin', 'bd-border', 'bd-padding', 'bd-content'].forEach(function (cls) {
     boxEl.querySelectorAll('.' + cls).forEach(function (el) {
@@ -310,7 +447,67 @@ hgap 是组件之间的间距（margin 的角色），LineBorder 是边框（bor
     boxEl.querySelectorAll('.hl').forEach(function (h) { h.classList.remove('hl'); });
   });
 
-  // 自检逻辑：点选项 → 判对错 → 显示解析 → 计分（与第 1 课同构）
+  // === 四层盒模型探索器：拖滑块 / 切 box-sizing，实时算尺寸 ===
+  var WIDTH = 300; // 设计宽（px），用来演示 width 的语义
+  var bs = 'border-box';
+  var dMargin = document.getElementById('dMargin');
+  var dBorder = document.getElementById('dBorder');
+  var rPad = document.getElementById('rPad'), vPad = document.getElementById('vPad');
+  var rBor = document.getElementById('rBor'), vBor = document.getElementById('vBor');
+  var rMar = document.getElementById('rMar'), vMar = document.getElementById('vMar');
+  var bsBtn = document.getElementById('bsBtn');
+  var readout = document.getElementById('readout');
+
+  function renderExplorer() {
+    var P = +rPad.value, B = +rBor.value, M = +rMar.value;
+    vPad.textContent = P; vBor.textContent = B; vMar.textContent = M;
+    // 外层 padding 模拟 margin 区染色；dBorder 承载 width，按 box-sizing 切语义
+    dMargin.style.padding = M + 'px';
+    dBorder.style.borderWidth = B + 'px';
+    dBorder.style.padding = P + 'px';
+    dBorder.style.boxSizing = bs;
+    dBorder.style.width = WIDTH + 'px';
+
+    var contentW, boxW;
+    if (bs === 'content-box') { contentW = WIDTH; boxW = WIDTH + 2 * P + 2 * B; }
+    else { boxW = WIDTH; contentW = WIDTH - 2 * P - 2 * B; }
+    var footprint = boxW + 2 * M;
+
+    var verdict;
+    if (bs === 'content-box') {
+      verdict = '你写 width:' + WIDTH + 'px，盒子却占了 ' + boxW + 'px —— 多出的 ' + (2*P+2*B) +
+        'px 是 padding 和 border。这就是 content-box 让人头疼的地方。';
+    } else {
+      verdict = 'width:' + WIDTH + 'px 就是 ' + boxW + 'px，所见即所得。padding 和 border 向内吃 content（content 只剩 ' +
+        contentW + 'px）。这就是为什么大家全局开 border-box。';
+    }
+
+    readout.innerHTML =
+      '<div class="legend">' +
+        '<span><span class="sw" style="background:var(--bm-margin)"></span>margin ' + M + 'px</span>' +
+        '<span><span class="sw" style="background:var(--bm-border)"></span>border ' + B + 'px</span>' +
+        '<span><span class="sw" style="background:var(--bm-padding)"></span>padding ' + P + 'px</span>' +
+        '<span><span class="sw" style="background:var(--bm-content);border:1px solid var(--rule)"></span>content</span>' +
+      '</div>' +
+      '<div class="calc">box-sizing: <span class="num">' + bs + '</span><br>' +
+        'width = <span class="num">' + WIDTH + 'px</span> &nbsp;|&nbsp; ' +
+        'content = <span class="num">' + contentW + 'px</span> &nbsp;|&nbsp; ' +
+        '盒子宽(含padding+border) = <span class="num">' + boxW + 'px</span> &nbsp;|&nbsp; ' +
+        '占地(再加margin) = <span class="num">' + footprint + 'px</span>' +
+      '</div>' +
+      '<div class="verdict">' + verdict + '</div>';
+  }
+
+  [rPad, rBor, rMar].forEach(function (r) { r.addEventListener('input', renderExplorer); });
+  bsBtn.addEventListener('click', function () {
+    bs = (bs === 'border-box') ? 'content-box' : 'border-box';
+    bsBtn.classList.toggle('on', bs === 'border-box');
+    bsBtn.innerHTML = '<code>box-sizing: ' + bs + '</code>（点击切换）';
+    renderExplorer();
+  });
+  renderExplorer();
+
+  // === 自检逻辑：点选项 → 判对错 → 显示解析 → 计分（与第 1 课同构） ===
   var total = document.querySelectorAll('.options').length;
   var answered = 0, right = 0;
   document.querySelectorAll('.options').forEach(function (ul) {

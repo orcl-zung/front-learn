@@ -46,6 +46,10 @@
 <p class="group-h">CSS 样式</p>
 <dl class="gloss">
   <dt>盒模型 box model</dt><dd>每个元素 = content + padding + border + margin 四层矩形。</dd>
+  <dt>box-sizing</dt><dd>决定 <code>width</code> 算到哪一层。<code>content-box</code>（默认）只算 content；
+    <code>border-box</code> 包含 padding + border，是实战事实标准，通常全局开启。</dd>
+  <dt>margin 折叠 margin collapsing</dt><dd>垂直相邻的两个 margin 合并取较大值（不叠加）。
+    水平方向不折叠；Flex / Grid 容器内不折叠。</dd>
   <dt>选择器 selector</dt><dd>决定样式规则作用于哪些元素（如 <code>.btn</code>、<code>#id</code>、<code>div &gt; p</code>）。</dd>
   <dt>Flexbox</dt><dd>一维（行或列）布局模型。后台界面排布的主力。</dd>
   <dt>Grid</dt><dd>二维（行+列）网格布局模型。</dd>
