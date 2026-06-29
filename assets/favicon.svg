@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="前端学习课程">
+  <rect width="32" height="32" rx="7" fill="#3b5bdb"/>
+  <g fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="12.5,10 6.5,16 12.5,22"/>
+    <polyline points="19.5,10 25.5,16 19.5,22"/>
+    <line x1="18.5" y1="8" x2="13.5" y2="24"/>
+  </g>
+</svg>
