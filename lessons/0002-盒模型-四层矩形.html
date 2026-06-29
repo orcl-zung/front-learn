@@ -126,7 +126,7 @@
     gap: .8rem 1.4rem; margin-top: 1rem;
     font-family: var(--sans); font-size: .9rem;
   }
-  .demo-controls label { display: flex; align-items: center; gap: .5rem; }
+  .demo-controls label { display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
   .demo-controls input[type="range"] { flex: 1; accent-color: var(--accent); }
   .demo-controls .val { font-family: var(--mono); min-width: 2.4em; text-align: right; color: var(--fg-muted); }
   .bs-btn {
@@ -144,7 +144,8 @@
     background: var(--bg-soft); border: 1px solid var(--rule);
     font-family: var(--mono); font-size: .85rem; line-height: 1.7;
   }
-  .demo-readout .legend { display: flex; flex-wrap: wrap; gap: .6rem 1.1rem; margin-bottom: .5rem; font-family: var(--sans); }
+  .demo-readout .legend { display: flex; flex-wrap: wrap; gap: .7rem 1.3rem; margin-bottom: .6rem; font-family: var(--sans); }
+  .demo-readout .legend > span { display: inline-flex; align-items: center; white-space: nowrap; }
   .demo-readout .sw { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; margin-right: .3rem; vertical-align: -1px; }
   .demo-readout .calc { color: var(--fg); }
   .demo-readout .verdict { margin-top: .4rem; color: var(--fg-muted); font-family: var(--sans); }
