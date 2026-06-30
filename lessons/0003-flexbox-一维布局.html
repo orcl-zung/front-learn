@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 3 课 · Flexbox：一维布局的主力</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<style>
+  /* === 两轴示意图 === */
+  .axes-fig { margin: 1.6rem 0; }
+  .axes-stage {
+    position: relative; display: flex; flex-direction: row; gap: .6rem;
+    min-height: 150px; padding: 1.4rem 1rem; border: 1px dashed var(--rule);
+    border-radius: 8px; background: var(--bg-stripe);
+  }
+  .axes-item {
+    flex: 0 0 64px; display: grid; place-items: center;
+    background: var(--accent-soft); border: 1px solid var(--accent-border);
+    color: var(--accent); border-radius: 6px; font-family: var(--sans);
+    font-weight: 700; font-size: .9rem;
+  }
+  .axes-cap {
+    position: absolute; font-family: var(--sans); font-size: .76rem;
+    font-weight: 700; padding: .1rem .45rem; border-radius: 4px;
+  }
+  .axes-cap.main {
+    top: -0.7rem; left: 50%; transform: translateX(-50%);
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .axes-cap.cross {
+    left: -0.6rem; top: 50%; transform: translateY(-50%) rotate(-90deg);
+    transform-origin: left top; background: var(--correct-soft); color: var(--correct);
+  }
+  .axes-note {
+    font-family: var(--sans); font-size: .86rem; color: var(--fg-muted);
+    margin-top: .7rem; text-align: center;
+  }
+
+  /* === Flex 操场：容器属性 === */
+  .lab { margin: 1.6rem 0; }
+  .fx-stage {
+    display: flex; min-height: 230px; padding: .9rem; gap: .6rem;
+    border: 1px dashed var(--rule); border-radius: 8px; background: var(--bg-stripe);
+    overflow: hidden;
+  }
+  .fx-item {
+    flex: 0 0 92px; min-height: 56px;
+    display: grid; place-items: center; border-radius: 6px; padding: .4rem;
+    font-family: var(--sans); font-size: .8rem; font-weight: 700; text-align: center;
+  }
+  .fx-item:nth-child(1) { background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); }
+  .fx-item:nth-child(2) { background: var(--correct-soft); border: 1px solid var(--correct); color: var(--correct); }
+  .fx-item:nth-child(3) { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); }
+  .fx-item:nth-child(4) { background: var(--bg-soft); border: 1px solid var(--rule); color: var(--fg-muted); }
+
+  .fx-controls {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: .3rem 1.4rem; margin-top: 1rem; font-family: var(--sans); font-size: .88rem;
+  }
+  .fx-controls fieldset {
+    border: 1px solid var(--rule); border-radius: 8px; padding: .4rem .8rem .6rem; margin: 0;
+  }
+  .fx-controls legend {
+    font-size: .72rem; font-weight: 700; color: var(--fg-muted);
+    text-transform: uppercase; letter-spacing: .05em; padding: 0 .3rem;
+  }
+  .fx-controls label {
+    display: inline-flex; align-items: center; gap: .3rem;
+    margin: .18rem .55rem .18rem 0; cursor: pointer; white-space: nowrap;
+  }
+  .fx-controls input[type="radio"] { accent-color: var(--accent); }
+  .fx-codebox { margin-top: 1rem; }
+
+  /* === flex-grow 分配 demo === */
+  .gw-stage {
+    display: flex; gap: .6rem; align-items: stretch; min-height: 90px;
+    padding: .8rem; border: 1px dashed var(--rule); border-radius: 8px;
+    background: var(--bg-stripe); overflow: hidden;
+  }
+  .gw-item {
+    flex-basis: 56px; min-width: 56px;
+    display: grid; place-items: center; border-radius: 6px;
+    font-family: var(--sans); font-weight: 700; font-size: 1rem;
+  }
+  .gw-item.A { background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); }
+  .gw-item.B { background: var(--correct-soft); border: 1px solid var(--correct); color: var(--correct); }
+  .gw-item.C { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); }
+  .gw-controls {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: .7rem 1.4rem; margin-top: 1rem; font-family: var(--sans); font-size: .9rem;
+  }
+  .gw-controls label { display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
+  .gw-controls input[type="range"] { flex: 1; min-width: 0; accent-color: var(--accent); }
+  .gw-controls .val { font-family: var(--mono); min-width: 1.6em; text-align: right; color: var(--fg-muted); }
+  .gw-readout {
+    margin-top: 1rem; padding: .85rem 1rem; border-radius: 8px;
+    background: var(--bg-soft); border: 1px solid var(--rule);
+    font-family: var(--mono); font-size: .85rem; line-height: 1.7;
+  }
+  .gw-readout .num { color: var(--accent); font-weight: 700; }
+  .gw-readout .verdict { margin-top: .35rem; color: var(--fg-muted); font-family: var(--sans); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="course-header">
+  <p class="eyebrow">第 3 课 · 阶段二：CSS 基础</p>
+  <h1>Flexbox：一维布局的主力</h1>
+  <p class="lead">导航栏、按钮组、表单标签和输入框并排、卡片排成一行 —— 这些"把东西排成一条线"的活，
+  全是 Flexbox 的主场。它是<strong>一维</strong>布局，类比 Swing 的 <code>BoxLayout</code>，
+  但对齐模型干净得多。这课后，你不再靠碰运气凑布局。</p>
+</header>
+
+<h2>本课目标</h2>
+<p>学完你能做到：</p>
+<ul>
+  <li>看到任何"一排 / 一列元素"的界面，知道该用 Flexbox，并能立刻指出主轴和交叉轴。</li>
+  <li>用 <code>display: flex</code> 加几个容器属性，排出居中、两端对齐、自动换行等常见效果。</li>
+  <li>解释 <code>flex-grow / shrink / basis</code> 三件套如何分配空间（类比 <code>BoxLayout</code> 的 glue / strut）。</li>
+  <li>说清为什么 Flex 容器里的 <code>margin</code> 不折叠 —— 呼应第 2 课那个"历史怪癖"。</li>
+</ul>
+
+<div class="callout">
+  <p class="callout-title">为什么这课是后台开发的看家本领</p>
+  <p>你过去粘 Vue 后台模块时，"按钮排一排""标签和输入框对齐""顶栏 logo 在左、菜单在右"几乎每页都有。
+  那时布局是<strong>改到大概齐就收手</strong>。Flexbox 给你一个稳定的内心模型：心里有主轴，
+  布局从"试出来的"变成"想出来的"。而且它正是后面 React/Vue 组件里最常用的排版手段。</p>
+</div>
+
+<h2>一、Flexbox 是什么：一维布局（先给 Java 骨架）</h2>
+<p>"一维"的意思是：它<strong>一次主要管一个方向</strong> —— 要么排成一行，要么排成一列。
+要同时管行和列（像表格、像画廊），那是下一课 Grid 的活。</p>
+
+<p>Flex 永远有两个角色：</p>
+<ul>
+  <li><strong>flex 容器</strong>（父元素）：你给它设 <code>display: flex</code>，它就不再按默认的块级/流式排版，而是改用 Flex 规则摆它的<strong>直接子元素</strong>。</li>
+  <li><strong>flex 项目</strong>（那些子元素）：被容器沿着一条轴排开的盒子。</li>
+</ul>
+
+<div class="analogy">
+  <div class="a-label">类比 · display:flex ≈ 给容器换上 BoxLayout</div>
+  <p>Swing 里你写 <code>new BoxLayout(panel, BoxLayout.X_AXIS)</code>，<code>panel</code> 就变成
+  "把子组件从左到右排成一行"；<code>Y_AXIS</code> 则是从上到下排成一列。CSS 里这一步是给容器写
+  <code>display: flex</code>，方向由 <code>flex-direction</code> 决定（<code>row</code> ≈ X_AXIS，
+  <code>column</code> ≈ Y_AXIS）。<strong>差别在下一步</strong>：BoxLayout 里你要手动塞
+  <code>Box.createHorizontalGlue()</code>（可伸缩的占位）去把元素推开、用 <code>setAlignmentX/Y</code>
+  调对齐；Flex 把这些做成了容器上的声明式属性（<code>justify-content</code> / <code>align-items</code>），
+  默认值就很合理，不用一个个组件去调。</p>
+</div>
+
+<h2>二、唯一要先钉死的模型：两条轴</h2>
+<p>Flex 九成的困惑，都来自没分清两条轴。先把这个模型刻进脑子：</p>
+<ul>
+  <li><strong>主轴（main axis）</strong>：<code>flex-direction</code> 指定的方向。<code>row</code> → 水平；<code>column</code> → 垂直。项目<strong>沿着主轴</strong>排开。</li>
+  <li><strong>交叉轴（cross axis）</strong>：与主轴<strong>垂直</strong>的那条。</li>
+</ul>
+<p>为什么这么重要？因为<strong>两套对齐属性各管一条轴</strong>：<code>justify-content</code> 管主轴，
+<code>align-items</code> 管交叉轴。下面这张图是 <code>flex-direction: row</code> 的情形 ——
+主轴水平、交叉轴垂直：</p>
+
+<div class="axes-fig">
+  <div class="axes-stage">
+    <span class="axes-cap main">主轴 main axis →（justify-content 管）</span>
+    <span class="axes-cap cross">交叉轴 cross axis（align-items 管）</span>
+    <div class="axes-item">1</div>
+    <div class="axes-item">2</div>
+    <div class="axes-item">3</div>
+  </div>
+  <p class="axes-note">换成 <code>flex-direction: column</code>，两条轴<strong>互换</strong>：主轴变垂直、交叉轴变水平。
+  记住这句口诀就不会混：<strong>主轴 = 排开项目的方向，交叉轴 = 与之垂直。</strong></p>
+</div>
+
+<h2>三、五个容器属性：互动操场</h2>
+<p>这是本课的核心。下面是一个<strong>实时操场</strong>：勾选不同的属性，看四个文章卡片怎么动。
+右下角的代码框同步生成你当前选择的 CSS —— 这就是你以后要写的样子。建议先把 <code>flex-direction</code>
+切到 <code>column</code>，体会两条轴如何互换；再逐个试 <code>justify-content</code>（注意它永远管主轴）。</p>
+
+<div class="lab">
+  <div class="fx-stage" id="fxStage">
+    <div class="fx-item">文章 1</div>
+    <div class="fx-item">文章 2</div>
+    <div class="fx-item">文章 3</div>
+    <div class="fx-item">文章 4</div>
+  </div>
+
+  <div class="fx-controls">
+    <fieldset>
+      <legend>flex-direction（主轴方向）</legend>
+      <label><input type="radio" name="fx-dir" value="row" checked>row</label>
+      <label><input type="radio" name="fx-dir" value="row-reverse">row-reverse</label>
+      <label><input type="radio" name="fx-dir" value="column">column</label>
+      <label><input type="radio" name="fx-dir" value="column-reverse">column-reverse</label>
+    </fieldset>
+    <fieldset>
+      <legend>justify-content（主轴对齐）</legend>
+      <label><input type="radio" name="fx-jc" value="flex-start" checked>flex-start</label>
+      <label><input type="radio" name="fx-jc" value="center">center</label>
+      <label><input type="radio" name="fx-jc" value="flex-end">flex-end</label>
+      <label><input type="radio" name="fx-jc" value="space-between">space-between</label>
+      <label><input type="radio" name="fx-jc" value="space-around">space-around</label>
+      <label><input type="radio" name="fx-jc" value="space-evenly">space-evenly</label>
+    </fieldset>
+    <fieldset>
+      <legend>align-items（交叉轴对齐）</legend>
+      <label><input type="radio" name="fx-ai" value="stretch" checked>stretch</label>
+      <label><input type="radio" name="fx-ai" value="flex-start">flex-start</label>
+      <label><input type="radio" name="fx-ai" value="center">center</label>
+      <label><input type="radio" name="fx-ai" value="flex-end">flex-end</label>
+    </fieldset>
+    <fieldset>
+      <legend>flex-wrap（是否换行）</legend>
+      <label><input type="radio" name="fx-wrap" value="nowrap" checked>nowrap</label>
+      <label><input type="radio" name="fx-wrap" value="wrap">wrap</label>
+    </fieldset>
+  </div>
+
+  <pre class="fx-codebox"><code id="fxCode"></code></pre>
+</div>
+
+<table>
+  <thead><tr><th>容器属性</th><th>管什么</th><th>常用值</th><th>Java 对应（直觉）</th></tr></thead>
+  <tbody>
+    <tr><td><code>display: flex</code></td><td>开启 Flex 布局</td><td>—</td><td>给容器装 <code>BoxLayout</code></td></tr>
+    <tr><td><code>flex-direction</code></td><td>主轴方向</td><td>row / column（+ reverse）</td><td><code>X_AXIS</code> / <code>Y_AXIS</code></td></tr>
+    <tr><td><code>justify-content</code></td><td>主轴上的对齐与间距分配</td><td>center / space-between / …</td><td>glue 把元素推开的效果</td></tr>
+    <tr><td><code>align-items</code></td><td>交叉轴上的对齐</td><td>stretch / center / …</td><td>每个组件的 <code>alignmentY/X</code></td></tr>
+    <tr><td><code>flex-wrap</code></td><td>放不下时换不换行</td><td>nowrap / wrap</td><td>BoxLayout 没有，需自己换布局</td></tr>
+    <tr><td><code>gap</code></td><td>项目之间的统一间距</td><td><code>1rem</code> 等</td><td><code>createHorizontalStrut(n)</code></td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <p class="callout-title">两个最值钱的对齐值</p>
+  <p><code>justify-content: space-between</code> 把第一个贴起点、最后一个贴终点、中间均分 ——
+  这就是<strong>导航栏</strong>（logo 最左、菜单最右）。<code>align-items: center</code> 让所有项目在交叉轴居中 ——
+  这就是<strong>按钮里图标和文字垂直对齐</strong>。两个值覆盖了后台八成的排版需求。</p>
+</div>
+
+<h2>四、项目怎么分空间：flex-grow / shrink / basis</h2>
+<p>上面是"项目保持自己大小、容器管对齐"。但很多时候你要的是<strong>项目主动填满空间</strong>：
+侧边栏固定宽、主内容区吃掉剩下所有的宽。这就得给<strong>项目</strong>设属性：</p>
+<ul>
+  <li><code>flex-basis</code>：项目的<strong>初始大小</strong>（沿主轴）。类比 Java 组件的 <code>preferredSize</code>。不写就按内容宽。</li>
+  <li><code>flex-grow</code>：容器有<strong>剩余空间</strong>时，按这个比例分给项目。0 = 不抢（默认）。</li>
+  <li><code>flex-shrink</code>：空间<strong>不够</strong>时，按这个比例让项目收缩。1 = 等比缩（默认）。</li>
+</ul>
+<p>下面拖三个滑块，给 A / B / C 设不同的 <code>flex-grow</code>，看剩余空间怎么按比例分给他们。
+读数会算出各自分到的百分比：</p>
+
+<div class="lab">
+  <div class="gw-stage" id="gwStage">
+    <div class="gw-item A">A</div>
+    <div class="gw-item B">B</div>
+    <div class="gw-item C">C</div>
+  </div>
+  <div class="gw-controls">
+    <label>A 的 flex-grow <input type="range" id="rGA" min="0" max="4" value="1" step="1"><span class="val" id="vGA">1</span></label>
+    <label>B 的 flex-grow <input type="range" id="rGB" min="0" max="4" value="1" step="1"><span class="val" id="vGB">1</span></label>
+    <label>C 的 flex-grow <input type="range" id="rGC" min="0" max="4" value="0" step="1"><span class="val" id="vGC">0</span></label>
+  </div>
+  <div class="gw-readout" id="gwReadout"></div>
+</div>
+
+<p>日常你几乎不会分开写三个，而是用简写 <code>flex</code>。背一个值就够：</p>
+<pre><code>/* 让一个项目吃掉所有剩余空间 —— 侧边栏旁边的主体区常用 */
+.main { flex: 1; }
+
+/* flex: 1 等价于 flex: 1 1 0 —— grow=1, shrink=1, basis=0（从 0 开始分，完全按比例） */
+/* flex: 0 0 200px —— 不长不缩，固定 200px（固定侧边栏） */</code></pre>
+
+<div class="analogy">
+  <div class="a-label">类比 · flex-grow ≈ BoxLayout 的 glue</div>
+  <p><code>Box.createHorizontalGlue()</code> 就是一个<strong>看不见、但会吃掉所有多出来空间</strong>的组件 ——
+  你塞一个在两个按钮中间，按钮就被推到两端。Flex 把这个机制做进了每个项目：<strong>给项目设
+  <code>flex-grow: 1</code>，它自己就变成那根"胶"</strong>，无需额外插占位组件。要"两块均分"，就两块都设
+  <code>flex: 1</code>；要 1:2，就 <code>flex: 1</code> 和 <code>flex: 2</code>。这就是上面滑块演示的原理。</p>
+</div>
+
+<h2>五、单个项目特立独行：align-self 与 order</h2>
+<ul>
+  <li><code>align-self</code>：容器统一了 <code>align-items</code>，但<strong>某一个项目</strong>想例外（比如其他都居中、就它顶部对齐），就给它单独写 <code>align-self</code>。取值和 <code>align-items</code> 一样。</li>
+  <li><code>order</code>：改项目的<strong>视觉顺序</strong>（默认都 0，越小的排越前）。<strong>慎用</strong>：它只动视觉、不动 DOM 顺序，屏幕阅读器和键盘 Tab 仍按 DOM 走 —— 视觉和无障碍顺序对不齐会坑用户。能靠改 HTML 顺序解决的，就别用 <code>order</code>。</li>
+</ul>
+
+<h2>六、三个必背配方</h2>
+<p>这三段代码覆盖了你在博客里最常遇到的排版。把它们和 Java 的做法对比 —— 你会发现声明式的 CSS 短得不像话。</p>
+
+<h3>配方 1：把一个元素居中（经典中的经典）</h3>
+<pre><code>.cover { display: flex; justify-content: center; align-items: center; }</code></pre>
+<p>主轴居中 + 交叉轴居中 = 完全居中。在 Java 里你得算坐标 / 用 <code>GridBagLayout</code> 配
+<code>anchor=CENTER</code>，这里一行搞定。博客封面图上的标题文字居中，就这么写。</p>
+
+<h3>配方 2：导航栏（logo 左、菜单右）</h3>
+<pre><code>.nav { display: flex; justify-content: space-between; align-items: center; }</code></pre>
+<div class="analogy">
+  <div class="a-label">类比 · 这就是 BorderLayout 的 NORTH 行</div>
+  <p>Java 里顶栏常用 <code>BorderLayout</code>：<code>WEST</code> 放 logo、<code>EAST</code> 放菜单按钮。
+  Flex 的 <code>justify-content: space-between</code> 达到一模一样的效果，而且一行属性、不用嵌套两个区域。
+  <code>align-items: center</code> 再保证 logo 和菜单<strong>垂直居中对齐</strong>，不会一个高一个低。</p>
+</div>
+
+<h3>配方 3：标签 chips 自动换行 + 等间距</h3>
+<pre><code>.tags { display: flex; flex-wrap: wrap; gap: .5rem; }</code></pre>
+<p><code>flex-wrap: wrap</code> 让 chips 放不下时自动折行；<code>gap</code> 统一间距。
+注意这里<strong>完全没用 margin</strong> —— 见下一节。</p>
+
+<h2>七、呼应第 2 课：Flex 里 margin 不折叠</h2>
+<p>第 2 课讲过一个历史怪癖：两个<strong>垂直相邻的块元素</strong>，上下 margin 会折叠（取较大者）。
+现在给你一个好消息：</p>
+<blockquote>一旦父容器是 <strong>Flex</strong>（或下节课的 Grid），子项目的 margin <strong>不再折叠</strong> ——
+垂直方向的 margin 也会正常相加。</blockquote>
+<p>所以现代布局里你基本碰不到 margin 折叠。更进一步：项目之间的间距，<strong>推荐用容器的 <code>gap</code></strong>，
+而不是给每个项目写 margin。原因有二：① <code>gap</code> 只在项目<strong>之间</strong>生效，不会在容器边缘多出一条
+（用 margin 你常常得写"去掉最后一个的右边距"这种补丁）；② 语义清晰 —— 间距是容器的职责，不是项目的。
+这就是为什么上面配方 3 用 <code>gap</code> 而非 <code>margin</code>。</p>
+
+<h2>博客落地：导航栏 + 标签条 + 卡片行</h2>
+<p>把今天钉到你的博客项目：</p>
+<ul>
+  <li><strong>顶部导航栏</strong>：站名在左、导航菜单在右 → 容器 <code>display:flex; justify-content:space-between; align-items:center</code>（配方 2）。</li>
+  <li><strong>文章的标签条</strong>：一排 chips、放不下折行 → <code>display:flex; flex-wrap:wrap; gap:.5rem</code>（配方 3）。</li>
+  <li><strong>文章列表</strong>：卡片排成一行、等宽填满 → 容器 <code>display:flex; gap:1rem</code>，每张卡片 <code>flex:1</code>。整齐排列用 Flex 完全够；等以后要做"严格网格 + 跨行跨列"，再请出下一课的 Grid。</li>
+</ul>
+<p><strong>动手</strong>：回到上面的<strong>互动操场</strong>，把 <code>justify-content</code> 调到 <code>space-between</code>、
+<code>align-items</code> 调到 <code>center</code> —— 你看到的就是你的博客导航栏。代码就在右下角，复制即用。</p>
+
+<h2>八、自检：两轴你挂对了吗？</h2>
+
+<p class="quiz-q"><span class="qnum">第 1 题 · 主轴方向</span><br><code>flex-direction: row</code> 下，<code>justify-content</code> 管的是哪个方向的对齐？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a">水平方向（主轴）</li>
+  <li data-k="b">垂直方向（交叉轴）</li>
+  <li data-k="c">两个方向都管</li>
+  <li data-k="d">取决于 align-items</li>
+</ul>
+<p class="explain"><code>justify-content</code> 永远管<strong>主轴</strong>。<code>row</code> 的主轴是水平的，所以它管水平对齐。
+记住口诀：主轴 = 排开项目的方向；<code>justify-content</code> 跟着主轴走，<code>align-items</code> 跟着交叉轴走。</p>
+
+<p class="quiz-q"><span class="qnum">第 2 题 · 居中配方</span><br>把一个元素在父容器里<strong>完全居中</strong>，需要哪两个属性（容器上）？</p>
+<ul class="options" data-correct="c">
+  <li data-k="a"><code>justify-content: center</code> + <code>flex-direction: column</code></li>
+  <li data-k="b"><code>align-items: center</code> + <code>flex-wrap: nowrap</code></li>
+  <li data-k="c"><code>justify-content: center</code> + <code>align-items: center</code></li>
+  <li data-k="d"><code>text-align: center</code> + <code>vertical-align: middle</code></li>
+</ul>
+<p class="explain">主轴居中（<code>justify-content</code>）+ 交叉轴居中（<code>align-items</code>）= 两个方向都居中 = 完全居中。
+前提是父容器 <code>display:flex</code>。<code>text-align</code> 只管行内文字，做不到块级居中。</p>
+
+<p class="quiz-q"><span class="qnum">第 3 题 · flex-grow 比例</span><br>同一行三个项目，A <code>flex-grow:1</code>、B <code>flex-grow:2</code>、C <code>flex-grow:1</code>（basis 都为 0）。剩余空间怎么分？</p>
+<ul class="options" data-correct="b">
+  <li data-k="a">A 30% / B 30% / C 30%（均分）</li>
+  <li data-k="b">A 25% / B 50% / C 25%</li>
+  <li data-k="c">A 50% / B 25% / C 25%</li>
+  <li data-k="d">A 33% / B 66% / C 0%</li>
+</ul>
+<p class="explain">grow 之和 = 1+2+1 = 4。各分得 grow/总和：A=1/4=25%，B=2/4=50%，C=1/4=25%。
+<code>flex-grow</code> 是<strong>按比例分剩余空间</strong>，比例就是它的值。这正是上面滑块 demo 演的事。</p>
+
+<p class="quiz-q"><span class="qnum">第 4 题 · gap vs margin</span><br>Flex 项目之间的间距，为什么推荐用容器的 <code>gap</code> 而不是给每个项目写 <code>margin</code>？</p>
+<ul class="options" data-correct="a">
+  <li data-k="a"><code>gap</code> 只在项目之间生效，不在容器边缘多出间距，也无需"去最后一个边距"的补丁</li>
+  <li data-k="b"><code>margin</code> 在 Flex 里完全不生效</li>
+  <li data-k="c"><code>gap</code> 能让项目自动换行，<code>margin</code> 不能</li>
+  <li data-k="d"><code>gap</code> 比 <code>margin</code> 渲染更快</li>
+</ul>
+<p class="explain"><code>margin</code> 在 Flex 里照样生效（只是不折叠），但用 margin 控间距常需写"去掉最后一项的边距"这种补丁，
+且边缘也会留白。<code>gap</code> 只作用于项目<strong>之间</strong>，语义干净。换行由 <code>flex-wrap</code> 控制，与 gap/margin 无关。</p>
+
+<p class="quiz-q"><span class="qnum">第 5 题 · 导航栏配方</span><br>实现"logo 贴左、菜单贴右、两者垂直居中对齐"的导航栏，容器该用？</p>
+<ul class="options" data-correct="c">
+  <li data-k="a"><code>justify-content: center; align-items: center</code></li>
+  <li data-k="b"><code>justify-content: flex-start; align-items: stretch</code></li>
+  <li data-k="c"><code>justify-content: space-between; align-items: center</code></li>
+  <li data-k="d"><code>justify-content: space-around; align-items: flex-end</code></li>
+</ul>
+<p class="explain"><code>space-between</code> 把首尾两个项目分别贴到起点和终点（logo 最左、菜单最右），
+<code>align-items: center</code> 让它们在交叉轴（垂直方向）居中对齐。这就是博客顶栏的标准写法（配方 2）。</p>
+
+<p class="score" id="score"></p>
+
+<hr>
+
+<h2>推荐主源（本课）</h2>
+<p>系统读：<a href="https://developer.mozilla.org/zh-CN/docs/Learn/CSS/CSS_layout/Flexbox" target="_blank" rel="noopener">MDN · Flexbox 布局</a>；
+当字典查每个属性：<a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex" target="_blank" rel="noopener">MDN · <code>flex</code></a>。
+想玩着记住？强烈推荐 <a href="https://flexboxfroggy.com/#zh-cn" target="_blank" rel="noopener">Flexbox Froggy</a>
+（写 CSS 把青蛙跳到荷叶上的小游戏，24 关通关，主轴交叉轴就长你手上了）。
+术语存疑回查 <a href="../reference/concept-map-java-frontend.html">概念对照表</a> 与
+<a href="../reference/glossary.html">术语表</a>。</p>
+
+<div class="callout">
+  <p class="callout-title">随时问我</p>
+  <p>这节课任何"似懂非懂"的点直接问。比如："我把 <code>align-items</code> 设了 center，为什么项目还是顶对齐？"
+  （多半是主轴/交叉轴搞反了）或 "<code>flex: 1</code> 和 <code>flex: 1 1 auto</code> 到底差在哪？"
+  —— 我顺着 BoxLayout 给你讲透。</p>
+</div>
+
+<footer class="lesson-foot">
+  <div class="nav-rows">
+    <span><a href="0002-盒模型-四层矩形.html">← 第 2 课：盒模型</a></span>
+    <span>
+      <a href="../reference/concept-map-java-frontend.html">概念对照表</a> ·
+      <a href="../reference/glossary.html">术语表</a> ·
+      下一课：Grid 二维布局 →
+    </span>
+  </div>
+</footer>
+</div>
+
+<script>
+  // === Flex 操场：勾选 radio → 实时应用到 stage + 生成 CSS 代码 ===
+  var fxStage = document.getElementById('fxStage');
+  var fxCode = document.getElementById('fxCode');
+  function fxVal(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function fxApply() {
+    var dir = fxVal('fx-dir'), jc = fxVal('fx-jc'), ai = fxVal('fx-ai'), wrap = fxVal('fx-wrap');
+    fxStage.style.flexDirection = dir;
+    fxStage.style.justifyContent = jc;
+    fxStage.style.alignItems = ai;
+    fxStage.style.flexWrap = wrap;
+    fxCode.textContent =
+      '.cards {\n' +
+      '  display: flex;\n' +
+      '  flex-direction: ' + dir + ';\n' +
+      '  justify-content: ' + jc + ';\n' +
+      '  align-items: ' + ai + ';\n' +
+      '  flex-wrap: ' + wrap + ';\n' +
+      '}';
+  }
+  ['fx-dir', 'fx-jc', 'fx-ai', 'fx-wrap'].forEach(function (name) {
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function (r) {
+      r.addEventListener('change', fxApply);
+    });
+  });
+  fxApply();
+
+  // === flex-grow 分配 demo：拖滑块 → 按比例分配 + 算百分比 ===
+  var rGA = document.getElementById('rGA'), vGA = document.getElementById('vGA');
+  var rGB = document.getElementById('rGB'), vGB = document.getElementById('vGB');
+  var rGC = document.getElementById('rGC'), vGC = document.getElementById('vGC');
+  var iA = document.querySelector('.gw-item.A');
+  var iB = document.querySelector('.gw-item.B');
+  var iC = document.querySelector('.gw-item.C');
+  var gwReadout = document.getElementById('gwReadout');
+
+  function gwApply() {
+    var a = +rGA.value, b = +rGB.value, c = +rGC.value;
+    vGA.textContent = a; vGB.textContent = b; vGC.textContent = c;
+    iA.style.flexGrow = a; iB.style.flexGrow = b; iC.style.flexGrow = c;
+
+    var sum = a + b + c, txt;
+    if (sum === 0) {
+      txt = '所有 flex-grow 都是 <span class="num">0</span> → 没人抢剩余空间，' +
+            '三个项目都保持初始大小（basis 56px），右边空着。';
+    } else {
+      var pa = Math.round(a / sum * 100), pb = Math.round(b / sum * 100), pc = Math.round(c / sum * 100);
+      txt = '剩余空间按 <span class="num">' + a + ' : ' + b + ' : ' + c + '</span> 分配 → ' +
+            'A <span class="num">' + pa + '%</span> · B <span class="num">' + pb + '%</span> · C <span class="num">' + pc + '%</span>';
+    }
+    gwReadout.innerHTML =
+      '<div>' + txt + '</div>' +
+      '<div class="verdict">这就是侧边栏固定、主体区 <code>flex:1</code> 吃掉剩余空间的原理；' +
+      '把 C 调成 0、A 和 B 设不同值，看"按比例分"的视觉效果。</div>';
+  }
+  [rGA, rGB, rGC].forEach(function (r) { r.addEventListener('input', gwApply); });
+  gwApply();
+
+  // === 自检逻辑：点选项 → 判对错 → 显示解析 → 计分（与第 1、2 课同构） ===
+  var total = document.querySelectorAll('.options').length;
+  var answered = 0, right = 0;
+  document.querySelectorAll('.options').forEach(function (ul) {
+    var correctKey = ul.dataset.correct;
+    var explain = ul.nextElementSibling.classList.contains('explain') ? ul.nextElementSibling : null;
+    ul.querySelectorAll('li').forEach(function (li) {
+      li.addEventListener('click', function () {
+        if (ul.dataset.locked) return;
+        ul.dataset.locked = '1';
+        var ok = li.dataset.k === correctKey;
+        li.classList.add(ok ? 'correct' : 'wrong');
+        if (!ok) {
+          ul.querySelector('li[data-k="' + correctKey + '"]').classList.add('correct');
+        }
+        if (explain) explain.classList.add('show');
+        answered++; if (ok) right++;
+        var box = document.getElementById('score');
+        if (answered === total) {
+          box.innerHTML = '得分：<strong>' + right + ' / ' + total + '</strong>' +
+            (right === total ? ' —— 满分！Flexbox 的主轴已经长在你心里了，可以进入 Grid。'
+             : ' —— 错的题点开解析看看，随时问我。');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
